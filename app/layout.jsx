@@ -6,7 +6,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { Toaster } from 'sonner';
 import Navbar from '@/components/Navbar';
-import AuthProvider from '@/components/AuthProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,7 +31,7 @@ export default function RootLayout({ children }) {
         <meta name="description" content="Professional video annotation and survey platform" />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
+       
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
             <Navbar />
             <AnimatePresence mode="wait" initial={false}>
@@ -50,7 +49,6 @@ export default function RootLayout({ children }) {
             </AnimatePresence>
             <Toaster richColors position="top-right" />
           </div>
-        </AuthProvider>
       </body>
     </html>
   );

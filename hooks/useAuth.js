@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import React, { useState } from "react";
 import { apiClient, apiClientWithAuth } from "../lib/axios";
@@ -13,11 +13,10 @@ export default function useAuth() {
     try {
       const response = await apiClient.post("/accounts/login", credentials);
       console.log("response", response.data);
-        if(typeof window !== 'undefined')
-     {
-       localStorage.setItem("token", response.data.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.data.user));
-     }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+      }
       return response.data;
     } catch (error) {
       console.error(error);
@@ -28,16 +27,41 @@ export default function useAuth() {
       setLoading(false);
     }
   };
+  // const register = async (credentials) => {
+  //   console.log("credentials", credentials);
+
+  //   setLoading(true);
+  //   try {
+  //     const response = await apiClient.post("accounts/signup", credentials);
+  //     console.log(response);
+  //     alert(
+  //       "A verification link has been sent to your email address, please click on that to access your account."
+  //     );
+  //   } catch (error) {
+  //     console.error(error);
+  //     setError(error.response.data.error);
+  //     throw Error(error.response.data.error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const register = async (credentials) => {
     console.log("credentials", credentials);
 
     setLoading(true);
     try {
-      const response = await apiClient.post("accounts/signup", credentials);
+      const response = await apiClient.post("accounts/signup", {
+        name: credentials.name,
+        email: credentials.email,
+        password: credentials.password,
+        confirmPassword: credentials.confirmPassword, // <-- Add this line
+      });
       console.log(response);
       alert(
         "A verification link has been sent to your email address, please click on that to access your account."
       );
+      return response.data; // return success flag to the page
     } catch (error) {
       console.error(error);
       setError(error.response.data.error);
@@ -73,10 +97,14 @@ export default function useAuth() {
     }
   };
   const resetPassword = async (token, password, confirmPassword) => {
+    console.log("parmas", token
+      , password, confirmPassword
+    );
+    
     try {
       const response = await apiClient.patch(
         `/accounts/reset-password/${token}`,
-        { password, confirmPassword }
+        { password,confirm_password: confirmPassword }
       );
       console.log("response", response.data);
       return response.data;
@@ -87,14 +115,20 @@ export default function useAuth() {
   };
   const logout = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    const token = (localStorage.getItem("token"));
+    const token = localStorage.getItem("token");
     // api client not used due to token issue
     try {
-      const response = await axios.post("https://prompthkit.apprikart.com/api/v1/accounts/logout", {
-        email: user.email,
-      }, {headers:{
-        Authorization: `Bearer ${token}`
-      }});
+      const response = await axios.post(
+        "https://prompthkit.apprikart.com/api/v1/accounts/logout",
+        {
+          email: user.email,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       return response.data;
     } catch (error) {
       console.error(error.response.data.error);
@@ -109,34 +143,32 @@ export default function useAuth() {
         email,
       });
       console.log(response.data);
-      setError(null)
+      setError(null);
       return response.data;
-      
     } catch (error) {
       console.error(error);
-      setError(error.response.data.error)
+      setError(error.response.data.error);
       return error.response.data;
-    }
-    finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
   const googleSignIn = async (token) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await apiClient.post("/accounts/auth/google", {code:token});
+      const response = await apiClient.post("/accounts/auth/google", {
+        code: token,
+      });
       console.log("response", response);
-        if(typeof window !== 'undefined')
-     {
-       localStorage.setItem("token", response.data.data.token);
-      localStorage.setItem("user", JSON.stringify(response.data.data.user));
-     }
+      if (typeof window !== "undefined") {
+        localStorage.setItem("token", response.data.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.data.user));
+      }
       return response.data;
-    }
-     catch (error) {
+    } catch (error) {
       // console.log("error", error);
-      
+
       console.error(error);
       setError(error.response.data.error);
 
@@ -144,8 +176,7 @@ export default function useAuth() {
     } finally {
       setLoading(false);
     }
-    
-  }
+  };
 
   return {
     login,
@@ -157,6 +188,6 @@ export default function useAuth() {
     logout,
     resetPassword,
     forgotPassword,
-    googleSignIn
+    googleSignIn,
   };
 }
