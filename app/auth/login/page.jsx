@@ -10,15 +10,14 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { signIn } from '@/lib/api/auth';
 import { toast } from 'sonner';
-import { useAuth } from '@/components/AuthProvider';
+import useAuth  from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { refreshAuth } = useAuth();
+  const { login, loading, error } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,16 +27,16 @@ export default function LoginPage() {
       return;
     }
 
-    setLoading(true);
     try {
-      await signIn({ email, password });
-      await refreshAuth();
+     const result = await login({ email, password });
+      if(result.success){
       toast.success('Welcome back!');
       router.push('/');
+      }
+
     } catch (error) {
       toast.error(error.message || 'Login failed');
     } finally {
-      setLoading(false);
     }
   };
 
