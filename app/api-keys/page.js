@@ -12,13 +12,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import {
   Copy,
@@ -34,11 +27,15 @@ import {
   Edit3,
   Check,
   X,
+  Cloud,
+  Activity,
+  Calendar,
+  Zap,
+  Thermometer,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Slider } from "@/components/ui/slider";
 import useSecretKey from "@/hooks/useSecretKey";
 import useProvidersKey from "@/hooks/useProvidersKey";
 
@@ -57,19 +54,19 @@ export default function ApiKeysPage() {
 
   // State for API Keys
   const [defaultProvider, setDefaultProvider] = useState("");
-  const [platform, setPlatform] = useState("");
+  const [platform, setPlatform] = useState("cloudinary");
   const [apiKey, setApiKey] = useState("");
-  const [maxTokens, setMaxTokens] = useState([1000]);
-  const [temperature, setTemperature] = useState([0.7]);
-  const [testLoading, setTestLoading] = useState(false);
+  const [apiSecret, setApiSecret] = useState("");
+  const [cloudName, setCloudName] = useState("");
+  const [temperature, setTemperature] = useState("");
   const [addLoading, setAddLoading] = useState(false);
   const [apiKeys, setApiKeys] = useState([]);
   const [showApiKey, setShowApiKey] = useState({});
+  const [selectedTab, setSelectedTab] = useState("api-keys");
+  const [showApiSecret, setShowApiSecret] = useState({});
 
   // State for editing providers
   const [editingProvider, setEditingProvider] = useState(null);
-  const [editMaxTokens, setEditMaxTokens] = useState([1000]);
-  const [editTemperature, setEditTemperature] = useState([0.7]);
   const [updateLoading, setUpdateLoading] = useState(false);
 
   // State for Secret Keys
@@ -79,7 +76,8 @@ export default function ApiKeysPage() {
 
   useEffect(() => {
     loadSecretKeys();
-    // getAllProviders(setApiKeys, setDefaultProvider);
+    getAllProviders(setApiKeys, setDefaultProvider);
+    setPlatform("cloudinary");
   }, []);
 
   const loadSecretKeys = async () => {
@@ -119,6 +117,8 @@ export default function ApiKeysPage() {
   };
 
   const handleDeleteSecretKey = async (id) => {
+    console.log("id", id);
+
     const isDeleteConfirmed = confirm(
       "Are you sure you want to delete this key?"
     );
@@ -126,6 +126,8 @@ export default function ApiKeysPage() {
       return;
     }
     try {
+      console.log("id passed for delete", id);
+
       const result = await deleteSecretKey(id);
       if (result.success) {
         await loadSecretKeys();
@@ -144,12 +146,15 @@ export default function ApiKeysPage() {
   };
 
   const handleSetDefault = async (key) => {
-    console.log(key);
     const isSuccess = await setProviderAsDefault(key);
     if (isSuccess) {
       setTimeout(() => {
         getAllProviders(setApiKeys, setDefaultProvider);
       }, 500);
+      toast({
+        title: "Default provider updated",
+        description: `${key.cloud_name} is now your default provider`,
+      });
     }
   };
 
@@ -175,35 +180,11 @@ export default function ApiKeysPage() {
     }));
   };
 
-  const handleTestConnection = async () => {
-    if (!platform || !apiKey) {
-      toast({
-        title: "Missing information",
-        description: "Please select a platform and enter an API key",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setTestLoading(true);
-
-    try {
-      // Mock API test with configuration
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      toast({
-        title: "Connection successful",
-        description: `Successfully connected to ${platform} API with max tokens: ${maxTokens[0]}, temperature: ${temperature[0]}`,
-      });
-    } catch (error) {
-      toast({
-        title: "Connection failed",
-        description: error.message || "Failed to connect to the API",
-        variant: "destructive",
-      });
-    } finally {
-      setTestLoading(false);
-    }
+  const toggleApiSecretKeyVisibility = (id) => {
+    setShowApiSecret((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
   };
 
   const handleDeleteProvider = async (key) => {
@@ -213,17 +194,24 @@ export default function ApiKeysPage() {
     if (!isConfirmed) {
       return;
     }
-    const isSuccess = await deleteProvider(key);
+    const isSuccess = await deleteProvider(key.id);
     if (isSuccess) {
+      if (key.id === defaultProvider) {
+        setDefaultProvider(null);
+      }
       getAllProviders(setApiKeys, setDefaultProvider);
+      toast({
+        title: "Provider deleted",
+        description: "Cloud platform key has been removed successfully",
+      });
     }
   };
 
   const handleAddKey = async () => {
-    if (!platform || !apiKey) {
+    if (!cloudName || !apiKey) {
       toast({
         title: "Missing information",
-        description: "Please select a platform and enter an API key",
+        description: "Please enter both cloud name and API key",
         variant: "destructive",
       });
       return;
@@ -233,24 +221,21 @@ export default function ApiKeysPage() {
 
     try {
       const result = await storeProviderKey(
+        cloudName,
         apiKey,
-        platform,
-        maxTokens[0],
-        temperature[0]
+        apiSecret,
+        "cloudinary"
       );
 
       if (result.success) {
         getAllProviders(setApiKeys, setDefaultProvider);
-
-        // Reset form
-        setPlatform("");
+        setCloudName("");
         setApiKey("");
-        setMaxTokens([1000]);
-        setTemperature([0.7]);
-
+        setApiSecret("");
+        setTemperature("");
         toast({
           title: "API key added",
-          description: `Your ${platform} API key has been securely stored with custom settings`,
+          description: `Your Cloudinary credentials have been saved`,
         });
       } else {
         toast({
@@ -262,7 +247,7 @@ export default function ApiKeysPage() {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to add API key",
+        description: "Unexpected error occurred",
         variant: "destructive",
       });
     } finally {
@@ -270,49 +255,51 @@ export default function ApiKeysPage() {
     }
   };
 
-  const resetConfiguration = () => {
-    setMaxTokens([1000]);
-    setTemperature([0.7]);
-    toast({
-      title: "Configuration Reset",
-      description: "Settings have been reset to default values",
-    });
-  };
-
   // Edit provider functions
   const handleEditProvider = (provider) => {
     setEditingProvider(provider.id);
-    setEditMaxTokens([provider.max_token || 1000]);
-    setEditTemperature([provider.temperature || 0.7]);
+    setCloudName(provider.cloud_name || "");
+    setApiKey(provider.api_key || "");
+    setApiSecret(provider.api_secret || "");
+    // Initialize visibility states for the edited provider
+    setShowApiKey((prev) => ({
+      ...prev,
+      [provider.id]: true,
+    }));
+    setShowApiSecret((prev) => ({
+      ...prev,
+      [provider.id]: true,
+    }));
   };
 
   const handleCancelEdit = () => {
     setEditingProvider(null);
-    setEditMaxTokens([1000]);
-    setEditTemperature([0.7]);
+    setCloudName("");
+    setApiKey("");
+    setApiSecret("");
   };
 
-  const handleUpdateProvider = async (provider) => {
+  const handleUpdateProvider = async () => {
     setUpdateLoading(true);
 
     try {
-      // Since we're using the same API as adding, we need to pass the existing API key
-      // You might need to adjust this based on your API structure
-      const currentProvider = provider;
-
       const result = await updateProviderKey(
-        provider,
-        editMaxTokens[0],
-        editTemperature[0]
+        editingProvider,
+        cloudName,
+        apiKey,
+        apiSecret,
+        true // Set is_default to true directly
       );
 
       if (result.success) {
         getAllProviders(setApiKeys, setDefaultProvider);
         setEditingProvider(null);
-
+        setCloudName("");
+        setApiKey("");
+        setApiSecret("");
         toast({
           title: "Settings updated",
-          description: `Configuration for ${currentProvider.name} has been updated successfully`,
+          description: `Configuration for ${cloudName} has been updated successfully`,
         });
       } else {
         toast({
@@ -332,551 +319,540 @@ export default function ApiKeysPage() {
     }
   };
 
-  const resetEditConfiguration = () => {
-    setEditMaxTokens([1000]);
-    setEditTemperature([0.7]);
-  };
-
   return (
-    <div className="space-y-8 p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-3xl font-bold tracking-tight">
-            API Keys Management
-          </h2>
-          <p className="text-muted-foreground mt-2">
-            Manage your secret keys and AI platform API keys with custom
-            configurations
-          </p>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50">
+      <div className="container mx-auto px-4 py-12 space-y-10">
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-gradient rounded-full shadow-lg">
+            <Key className="h-8 w-8 text-white" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold tracking-tight bg-purple-gradient bg-clip-text text-transparent">
+              API Keys Management
+            </h1>
+            <p className="text-lg text-gray-600 mt-2 max-w-2xl mx-auto">
+              Securely manage your cloud platform API keys and secret keys with
+              advanced configuration options
+            </p>
+          </div>
         </div>
-      </div>
 
-      <Tabs defaultValue="api-keys" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="api-keys" className="flex items-center gap-2">
-            <Key className="h-4 w-4" />
-            AI Platform Keys
-          </TabsTrigger>
-          <TabsTrigger value="secret-keys" className="flex items-center gap-2">
-            <ShieldCheck className="h-4 w-4" />
-            Secret Keys
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="api-keys" className="space-y-6">
-          {/* Add New API Key Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Plus className="h-5 w-5 text-primary" />
-                Add New AI Platform Key
-              </CardTitle>
-              <CardDescription>
-                Connect your AI platform API keys with custom configuration
-                settings
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Basic Configuration */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Settings className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">
-                      Basic Configuration
-                    </h3>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="platform">AI Platform</Label>
-                    <Select value={platform} onValueChange={setPlatform}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select AI platform" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {providers?.map((provider) => (
-                          <SelectItem key={provider.id} value={provider.id}>
-                            <span className="flex items-center gap-2">
-                              {/* {provider.id === "openai" ? <SiOpenai /> : <SiGooglegemini />} */}
-                              {provider.name}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="apiKey">API Key</Label>
-                    <div className="relative">
-                      <Input
-                        id="apiKey"
-                        type={showApiKey.new ? "text" : "password"}
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        placeholder="Enter your API key"
-                        className="pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                        onClick={() => toggleApiKeyVisibility("new")}
-                      >
-                        {showApiKey.new ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </Button>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      🔒 Your API key will be encrypted before storage
-                    </p>
-                  </div>
+        <Tabs
+          value={selectedTab}
+          onValueChange={setSelectedTab}
+          defaultValue="api-keys"
+          className="space-y-10"
+        >
+          <div className="flex justify-center w-full">
+            <TabsList className="flex w-full bg-purple-gradient backdrop-blur-sm shadow-md rounded-full p-1">
+              <TabsTrigger
+                value="api-keys"
+                className="flex-1 text-center text-sm font-medium py-2 px-4 transition-all duration-200 
+              rounded-full text-white data-[state=active]:bg-white data-[state=active]:text-purple-600"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Cloud className="h-4 w-4" />
+                  Cloud Platform Keys
                 </div>
+              </TabsTrigger>
 
-                {/* Advanced Configuration */}
-                <div className="space-y-4">
-                  {/* <div className="flex items-center gap-2 mb-4">
-                    <Settings className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">Advanced Settings</h3>
-                  </div> */}
+              <TabsTrigger
+                value="secret-keys"
+                className="flex-1 text-center text-sm font-medium py-2 px-4 transition-all duration-200 
+              rounded-full text-white data-[state=active]:bg-white data-[state=active]:text-purple-600"
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <ShieldCheck className="h-4 w-4" />
+                  Secret Keys
+                </div>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-                  <div className="space-y-4">
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="cloud_name">Cloud Name</Label>
-                        {/* <Badge variant="secondary">{maxTokens[0]}</Badge> */}
+          <TabsContent value="api-keys" className="space-y-10">
+            {/* Add New API Key Section */}
+            <Card className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-2xl rounded-2xl w-full">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-2xl p-8">
+                <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-gray-800">
+                  <div className="p-3 bg-purple-gradient rounded-full">
+                    <Plus className="h-5 w-5 text-white" />
+                  </div>
+                  {editingProvider
+                    ? "Update Cloud Platform Key"
+                    : "Add New Cloud Platform Key"}
+                </CardTitle>
+                <CardDescription className="text-gray-600 text-base">
+                  {editingProvider
+                    ? "Update your Cloud platform API keys with custom configuration settings"
+                    : "Connect your Cloud platform API keys with custom configuration settings"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8 space-y-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Basic Configuration */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                      <div className="p-2 bg-purple-gradient rounded-full">
+                        <Settings className="h-5 w-5 text-white" />
                       </div>
-                      <Input
-                        id="cloudName"
-                        type="text"
-                        value={apiKey}
-                        onChange={(e) => setApiKey(e.target.value)}
-                        placeholder="Enter your cloud name"
-                        className="pr-10"
-                      />
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Basic Configuration
+                      </h3>
                     </div>
 
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="temperature">Temperature</Label>
-                        <Badge variant="secondary">{temperature[0]}</Badge>
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="platform"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        Cloud Platform
+                      </Label>
+                      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200 rounded-lg px-4 py-3 flex items-center gap-3">
+                        <Cloud className="h-5 w-5 text-purple-600" />
+                        <span className="font-medium text-purple-900">
+                          Cloudinary
+                        </span>
                       </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="apiKey"
+                        className="text-sm font-medium text-gray-700"
+                      >
+                        API Key
+                      </Label>
                       <div className="relative">
-                        <Input
-                          id="apiKey"
-                          type={showApiKey.new ? "text" : "password"}
-                          value={apiKey}
-                          onChange={(e) => setApiKey(e.target.value)}
-                          placeholder="Enter your cloud name"
-                          className="pr-10"
-                        />
+                        <div className="bg-gray-300 p-[1.5px] rounded-lg">
+                          <Input
+                            id="apiKey"
+                            type={
+                              showApiKey[editingProvider] ? "text" : "password"
+                            }
+                            value={apiKey}
+                            onChange={(e) => setApiKey(e.target.value)}
+                            placeholder="Enter your API key"
+                            className="w-full h-12 bg-white rounded-lg px-4 pr-12 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                          />
+                        </div>
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                          onClick={() => toggleApiKeyVisibility("new")}
+                          className="absolute right-2 top-2 h-8 w-8 p-0 rounded-full"
+                          onClick={() =>
+                            toggleApiKeyVisibility(editingProvider)
+                          }
                         >
-                          {showApiKey.new ? (
-                            <EyeOff className="h-4 w-4" />
+                          {showApiKey[editingProvider] ? (
+                            <EyeOff className="h-4 w-4 text-gray-500" />
                           ) : (
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-4 w-4 text-gray-500" />
                           )}
                         </Button>
                       </div>
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <ShieldCheck className="h-3 w-3" />
+                        Your API key will be encrypted before storage
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Advanced Configuration */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                      <div className="p-2 bg-purple-gradient rounded-full">
+                        <Zap className="h-5 w-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Advanced Settings
+                      </h3>
                     </div>
 
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={resetConfiguration}
-                      className="w-full"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Reset to Defaults
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <div></div>
-              <Button
-                onClick={handleAddKey}
-                disabled={!platform || !apiKey || addLoading}
-                className="bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:opacity-90"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                {addLoading ? "Adding..." : "Add API Key"}
-              </Button>
-            </CardFooter>
-          </Card>
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="cloudName"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          Cloud Name
+                        </Label>
+                        <div className="relative">
+                          <div className="bg-gray-300 p-[1.5px] rounded-lg">
+                            <Input
+                              id="cloudName"
+                              type="text"
+                              value={cloudName}
+                              onChange={(e) => setCloudName(e.target.value)}
+                              placeholder="Enter a unique cloud name"
+                              className="w-full h-12 bg-white rounded-lg px-4 pr-12 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                            />
+                          </div>
+                        </div>
+                      </div>
 
-          {/* Existing API Keys */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Your AI Platform Keys</CardTitle>
-              <CardDescription>
-                Manage your connected AI platform API keys and their
-                configurations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {apiKeys.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="rounded-full bg-muted p-4">
-                    <Key className="h-8 w-8 text-muted-foreground" />
+                      <div className="space-y-2">
+                        <Label
+                          htmlFor="apiSecret"
+                          className="text-sm font-medium text-gray-700"
+                        >
+                          API Secret Key
+                        </Label>
+                        <div className="relative">
+                          <div className="bg-gray-300 p-[1.5px] rounded-lg">
+                            <Input
+                              id="apiSecret"
+                              type={
+                                showApiSecret[editingProvider]
+                                  ? "text"
+                                  : "password"
+                              }
+                              value={apiSecret}
+                              onChange={(e) => setApiSecret(e.target.value)}
+                              placeholder="Enter your API secret"
+                              className="w-full h-12 bg-white rounded-lg px-4 pr-12 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                            />
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-2 h-8 w-8 p-0 rounded-full"
+                            onClick={() =>
+                              toggleApiSecretKeyVisibility(editingProvider)
+                            }
+                          >
+                            {showApiSecret[editingProvider] ? (
+                              <EyeOff className="h-4 w-4 text-gray-500" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-gray-500" />
+                            )}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <ShieldCheck className="h-3 w-3" />
+                          Your API Secret Key will be encrypted before storage
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <h3 className="mt-4 text-lg font-semibold">
-                    No API keys added
-                  </h3>
-                  <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-                    Add your first AI platform API key to start using advanced
-                    AI features with custom configurations.
-                  </p>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {apiKeys?.map((key) => (
-                    <div
-                      key={key.id}
-                      className={`border rounded-lg p-4 transition-colors relative ${
-                        defaultProvider === key.id
-                          ? "border-primary bg-primary/5 hover:bg-primary/10"
-                          : "hover:bg-accent/50"
-                      }`}
-                    >
-                      {editingProvider === key.id ? (
-                        // Edit Mode
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-3">
+              </CardContent>
+
+              <CardFooter className="bg-gray-50/80 rounded-b-2xl p-6">
+                <div className="flex justify-end w-full">
+                  <Button
+                    onClick={
+                      editingProvider ? handleUpdateProvider : handleAddKey
+                    }
+                    disabled={
+                      !platform ||
+                      !apiKey ||
+                      (editingProvider ? updateLoading : addLoading)
+                    }
+                    className="cursor-pointer bg-purple-gradient hover:opacity-90 text-white shadow-lg hover:shadow-xl rounded-lg px-8 py-3 h-auto transition-all duration-200"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    {editingProvider
+                      ? updateLoading
+                        ? "Updating..."
+                        : "Update API Key"
+                      : addLoading
+                      ? "Adding..."
+                      : "Add API Key"}
+                  </Button>
+                </div>
+              </CardFooter>
+            </Card>
+
+            {/* Existing API Keys */}
+            <Card className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-2xl rounded-2xl w-full">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-2xl p-8">
+                <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-gray-800">
+                  <div className="p-3 bg-purple-gradient rounded-full">
+                    <Key className="h-5 w-5 text-white" />
+                  </div>
+                  Your Cloud Platform Keys
+                </CardTitle>
+                <CardDescription className="text-gray-600 text-base">
+                  Manage your connected Cloud platform API keys and their
+                  configurations
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                {apiKeys.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center py-16 text-center">
+                    <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center mb-6">
+                      <Key className="h-10 w-10 text-purple-600" />
+                    </div>
+                    <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                      No API keys added
+                    </h3>
+                    <p className="text-gray-600 max-w-md text-lg leading-relaxed">
+                      Add your first Cloud platform API key to start using
+                      advanced Cloud features with custom configurations.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {providers?.map((key) => (
+                      <div
+                        key={key.id}
+                        className={`relative overflow-hidden rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
+                          defaultProvider === key.id
+                            ? "border-yellow-300 bg-gradient-to-r from-yellow-50 to-amber-50 shadow-md"
+                            : "border-gray-200 bg-white hover:border-purple-200 hover:bg-purple-50/30"
+                        }`}
+                      >
+                        <div className="p-6">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
                               <div className="relative">
-                                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center"></div>
+                                <div className="w-14 h-14 bg-purple-gradient rounded-full flex items-center justify-center shadow-lg">
+                                  <Cloud className="h-7 w-7 text-white" />
+                                </div>
                                 {defaultProvider === key.id && (
-                                  <div className="absolute -top-1 -right-1 bg-yellow-500 rounded-full p-1">
+                                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full p-1.5 shadow-lg">
                                     <Crown className="h-3 w-3 text-white" />
                                   </div>
                                 )}
                               </div>
                               <div>
-                                <div className="flex items-center gap-2">
-                                  <h4 className="font-semibold capitalize">
-                                    {key.name || key.platform}
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h4 className="text-xl font-semibold capitalize text-gray-800">
+                                    {key.cloud_name || key.provider}
                                   </h4>
-                                  <Badge variant="outline" className="text-xs">
-                                    Editing
-                                  </Badge>
+                                  {defaultProvider === key.id && (
+                                    <Badge className="bg-gradient-to-r from-yellow-400 to-amber-500 text-white border-0 shadow-sm px-2 py-1 rounded-full">
+                                      <Crown className="h-3 w-3 mr-1" />
+                                      Default
+                                    </Badge>
+                                  )}
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                  Update configuration settings
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleCancelEdit}
-                                disabled={updateLoading}
-                              >
-                                <X className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUpdateProvider(key)}
-                                disabled={updateLoading}
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                              >
-                                <Check className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor={`editMaxTokens-${key.id}`}>
-                                  Max Tokens
-                                </Label>
-                                <Badge variant="secondary">
-                                  {editMaxTokens[0]}
-                                </Badge>
-                              </div>
-                              <Slider
-                                id={`editMaxTokens-${key.id}`}
-                                min={100}
-                                max={4000}
-                                step={100}
-                                value={editMaxTokens}
-                                onValueChange={setEditMaxTokens}
-                                className="w-full"
-                              />
-                            </div>
-
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between">
-                                <Label htmlFor={`editTemperature-${key.id}`}>
-                                  Temperature
-                                </Label>
-                                <Badge variant="secondary">
-                                  {editTemperature[0]}
-                                </Badge>
-                              </div>
-                              <Slider
-                                id={`editTemperature-${key.id}`}
-                                min={0}
-                                max={2}
-                                step={0.1}
-                                value={editTemperature}
-                                onValueChange={setEditTemperature}
-                                className="w-full"
-                              />
-                            </div>
-                          </div>
-
-                          <div className="flex justify-end">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={resetEditConfiguration}
-                              disabled={updateLoading}
-                            >
-                              <RefreshCw className="h-4 w-4 mr-2" />
-                              Reset to Defaults
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        // View Mode
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="relative">
-                              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                                {/* {key.name === "Openai" ? <SiOpenai className="h-5 w-5" /> : <SiGooglegemini className="h-5 w-5" />} */}
-                              </div>
-                              {defaultProvider === key.id && (
-                                <div className="absolute -top-1 -right-1 bg-yellow-500 rounded-full p-1">
-                                  <Crown className="h-3 w-3 text-white" />
+                                <div className="flex items-center gap-4 text-sm text-gray-600">
+                                  <div className="flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    Last used: {key.lastUsed || "Unknown"}
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Activity className="h-3 w-3" />
+                                    Status: {key.hasKey ? "Active" : "Inactive"}
+                                  </div>
                                 </div>
-                              )}
-                            </div>
-                            <div>
-                              <div className="flex items-center gap-2">
-                                <h4 className="font-semibold capitalize">
-                                  {key.name || key.platform}
-                                </h4>
-                                {defaultProvider === key.id && (
-                                  <Badge
-                                    variant="secondary"
-                                    className="text-xs bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                  >
-                                    Default
-                                  </Badge>
-                                )}
-                              </div>
-                              <p className="text-sm text-muted-foreground">
-                                Last used: {key.lastUsed || "Unknown"}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-4">
-                            <div className="text-right">
-                              <Badge
-                                className={
-                                  key.hasKey
-                                    ? "bg-green-100 text-green-800 hover:bg-green-100"
-                                    : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100"
-                                }
-                              >
-                                {key.hasKey ? "Active" : "Inactive"}
-                              </Badge>
-                              <div className="text-xs text-muted-foreground mt-1">
-                                Tokens: {key.max_token || 1000} | Temp:{" "}
-                                {key.temperature || 0.7}
                               </div>
                             </div>
-                            <div className="flex gap-2">
-                              {defaultProvider !== key.id && key.hasKey && (
+                            <div className="flex items-center gap-6">
+                              <div className="text-right space-y-2">
+                                {/* <Badge
+                                  className={
+                                    key.hasKey
+                                      ? "bg-green-100 text-green-800 hover:bg-green-100 border-green-200 px-2 py-1 rounded-full"
+                                      : "bg-yellow-100 text-yellow-800 hover:bg-yellow-100 border-yellow-200 px-2 py-1 rounded-full"
+                                  }
+                                >
+                                  {key.hasKey ? "Active" : "Inactive"}
+                                </Badge> */}
                                 <Button
-                                  variant="outline"
                                   size="sm"
+                                  variant="outline"
                                   onClick={() => handleSetDefault(key)}
-                                  className="text-xs"
+                                  className="text-xs bg-purple-gradient text-white hover:bg-purple-600 rounded-lg px-3 py-1"
                                 >
                                   Set Default
                                 </Button>
-                              )}
-                              {key.hasKey && (
+                              </div>
+                              <div className="flex gap-2">
+                                {defaultProvider !== key.id && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleSetDefault(key)}
+                                    className="text-xs bg-purple-gradient text-white hover:bg-purple-600 rounded-lg"
+                                  >
+                                    Set Default
+                                  </Button>
+                                )}
+                                {key.id && (
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleEditProvider(key)}
+                                    className="p-1 bg-purple-gradient text-white hover:bg-purple-600 rounded-lg"
+                                  >
+                                    <Edit3 className="h-4 w-4" />
+                                  </Button>
+                                )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  onClick={() => handleEditProvider(key)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                  className="p-1 bg-gradient-to-br from-red-500 to-red-600 text-white hover:bg-red-700 rounded-lg"
+                                  onClick={() => handleDeleteProvider(key)}
                                 >
-                                  <Edit3 className="h-4 w-4" />
+                                  <Trash2 className="h-4 w-4" />
                                 </Button>
-                              )}
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                onClick={() => handleDeleteProvider(key)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="secret-keys" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-primary" />
-                Secret Keys Management
-              </CardTitle>
-              <CardDescription>
-                Create and manage secret keys for your applications and
-                integrations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Create New Secret Key */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Plus className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold">
-                      Create New Secret Key
-                    </h3>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-1">
-                      <Input
-                        id="newKeyLabel"
-                        value={newKeyLabel}
-                        onChange={(e) => setNewKeyLabel(e.target.value)}
-                        placeholder="Enter a descriptive label for your key (e.g., 'Production API', 'Development')"
-                      />
-                    </div>
-                    <Button
-                      onClick={handleCreateSecretKey}
-                      disabled={!newKeyLabel || loading}
-                      className="bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:opacity-90"
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Key
-                    </Button>
-                  </div>
-                </div>
-
-                <Separator />
-
-                {/* Existing Secret Keys */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold">Your Secret Keys</h3>
-
-                  {secretKeys?.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <div className="rounded-full bg-muted p-4">
-                        <ShieldCheck className="h-8 w-8 text-muted-foreground" />
                       </div>
-                      <h3 className="mt-4 text-lg font-semibold">
-                        No Secret Keys
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="secret-keys" className="space-y-10">
+            <Card className="bg-white/95 backdrop-blur-sm border border-gray-100 shadow-2xl rounded-2xl w-full">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-t-2xl p-8">
+                <CardTitle className="flex items-center gap-3 text-2xl font-semibold text-gray-800">
+                  <div className="p-3 bg-purple-gradient rounded-full">
+                    <ShieldCheck className="h-5 w-5 text-white" />
+                  </div>
+                  Secret Keys Management
+                </CardTitle>
+                <CardDescription className="text-gray-600 text-base">
+                  Create and manage secret keys for your applications and
+                  integrations
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="p-8">
+                <div className="space-y-8">
+                  {/* Create New Secret Key */}
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+                      <div className="p-2 bg-purple-gradient rounded-full">
+                        <Plus className="h-5 w-5 text-white" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800">
+                        Create New Secret Key
                       </h3>
-                      <p className="mt-2 text-sm text-muted-foreground max-w-sm">
-                        Create your first secret key to start using the API and
-                        enable secure access to your applications.
-                      </p>
                     </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {secretKeys?.map((key) => (
-                        <div
-                          key={key.id}
-                          className="border rounded-lg p-4 hover:bg-accent/50 transition-colors"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <Key className="h-4 w-4 text-primary" />
-                              </div>
-                              <div>
-                                <h4 className="font-semibold">{key.label}</h4>
-                                <p className="text-xs text-muted-foreground">
-                                  Created:{" "}
-                                  {new Date(key.createdAt).toLocaleDateString()}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() =>
-                                  toggleSecretKeyVisibility(key.id)
-                                }
-                              >
-                                {showSecretKeys[key.id] ? (
-                                  <EyeOff className="h-4 w-4" />
-                                ) : (
-                                  <Eye className="h-4 w-4" />
-                                )}
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => copySecretKey(key.key)}
-                              >
-                                <Copy className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                                onClick={() => handleDeleteSecretKey(key.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <Label className="text-xs font-medium text-muted-foreground">
-                              Secret Key
-                            </Label>
-                            <Input
-                              value={key.key}
-                              readOnly
-                              type={
-                                showSecretKeys[key.id] ? "text" : "password"
-                              }
-                              className="font-mono text-sm"
-                            />
-                          </div>
+                    <div className="flex items-center space-x-4">
+                      <div className="flex-1">
+                        <div className="bg-gray-300 p-[1.5px] rounded-lg">
+                          <Input
+                            id="newKeyLabel"
+                            value={newKeyLabel}
+                            onChange={(e) => setNewKeyLabel(e.target.value)}
+                            placeholder="Enter a descriptive label for your key (e.g., 'Production API', 'Development')"
+                            className="w-full h-12 bg-white rounded-lg px-4 pr-12 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                          />
                         </div>
-                      ))}
+                      </div>
+                      <Button
+                        onClick={handleCreateSecretKey}
+                        disabled={!newKeyLabel || loading}
+                        className="cursor-pointer bg-purple-gradient hover:opacity-90 text-white shadow-lg hover:shadow-xl rounded-lg px-8 py-3 h-auto transition-all duration-200"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Key
+                      </Button>
                     </div>
-                  )}
+                  </div>
+
+                  <Separator />
+
+                  {/* Existing Secret Keys */}
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      Your Secret Keys
+                    </h3>
+
+                    {secretKeys?.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 text-center">
+                        <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-indigo-100 rounded-full flex items-center justify-center mb-6">
+                          <ShieldCheck className="h-10 w-10 text-purple-600" />
+                        </div>
+                        <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                          No Secret Keys
+                        </h3>
+                        <p className="text-gray-600 max-w-md text-lg leading-relaxed">
+                          Create your first secret key to start using the API
+                          and enable secure access to your applications.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {secretKeys?.map((key) => (
+                          <div
+                            key={key.id}
+                            className="border-2 border-gray-200 rounded-xl p-6 hover:border-purple-200 hover:bg-purple-50/30 transition-all duration-300"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-purple-gradient rounded-full flex items-center justify-center shadow-lg">
+                                  <Key className="h-6 w-6 text-white" />
+                                </div>
+                                <div>
+                                  <h4 className="text-lg font-semibold text-gray-800">
+                                    {key.label}
+                                  </h4>
+                                  <p className="text-sm text-gray-600 flex items-center gap-1">
+                                    <Calendar className="h-3 w-3" />
+                                    Created:{" "}
+                                    {new Date(
+                                      key.createdAt
+                                    ).toLocaleDateString()}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() =>
+                                    toggleSecretKeyVisibility(key.id)
+                                  }
+                                  className="p-1 bg-purple-gradient text-white hover:bg-purple-600 rounded-lg"
+                                >
+                                  {showSecretKeys[key.id] ? (
+                                    <EyeOff className="h-4 w-4" />
+                                  ) : (
+                                    <Eye className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copySecretKey(key.key)}
+                                  className="p-1 bg-purple-gradient text-white hover:bg-purple-600 rounded-lg"
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="p-1 bg-gradient-to-br from-red-500 to-red-600 text-white hover:bg-red-700 rounded-lg"
+                                  onClick={() => handleDeleteSecretKey(key.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <div className="bg-gray-300 p-[1.5px] rounded-lg">
+                                <Input
+                                  value={key.key}
+                                  readOnly
+                                  type={
+                                    showSecretKeys[key.id] ? "text" : "password"
+                                  }
+                                  className="w-full h-12 bg-white rounded-lg px-4 pr-12 border-none focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

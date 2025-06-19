@@ -4,79 +4,94 @@ import { toast } from "./use-toast";
 
 export default function useProvidersKey() {
   const [providers, setProviders] = useState([]);
-  // const [defaultProvider, setDefaultProvider] = useState("")
 
   const getAllProviders = async (setApiKeys, setDefaultProvider) => {
     try {
-      const response = await apiClientWithAuth.get("/ai/providers");
-      console.log("Providers", response.data);
-      setProviders(response.data.data.providers);
-      setDefaultProvider(response.data.data.defaultProvider);
-      const apiKeys = response.data.data.providers.filter(
-        (provider) => provider.hasKey === true
-      );
-      setApiKeys(apiKeys);
-      if (response.data.data.defaultProvider!==null) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch (error) {
-      console.error(error);
-      // setError(error.response.data.error);
+      const response = await apiClientWithAuth.get("/cdn-configs");
+      const configs = response.data.data.configs || [];
 
-      // throw Error(error?.response?.data?.error);
+      // Store full configs in hook state
+      setProviders(configs);
+
+      // Set default provider ID
+      const defaultConfig = configs.find((cfg) => cfg.is_default);
+      setDefaultProvider(defaultConfig?.id || null);
+
+      // Optional: set active keys (if you still want to filter)
+      const activeKeys = configs.filter((cfg) => cfg.is_active);
+      setApiKeys(activeKeys);
+
+      return true;
+    } catch (error) {
+      console.error(
+        "getAllProviders error:",
+        error?.response?.data || error.message
+      );
+      return false;
     }
   };
 
-  const storeProviderKey = async (apiKey, provider, maxToken, temperature) => {
+  const storeProviderKey = async (
+    cloud_name,
+    api_key,
+    api_secret,
+    provider = "cloudinary"
+  ) => {
     try {
-      const response = await apiClientWithAuth.post("/ai/provider-key", {
-        apiKey,
+      const response = await apiClientWithAuth.post("/cdn-configs", {
         provider,
-        maxToken,
-        temperature,
+        cloud_name,
+        api_key,
+        api_secret,
       });
       console.log("response", response);
       return response.data;
     } catch (error) {
-      console.error(error);
-
-      return error.response.data;
+      console.error(
+        "storeProviderKey error:",
+        error?.response?.data || error.message
+      );
+      return error.response?.data || { success: false, error: "Unknown error" };
     }
   };
 
   const setProviderAsDefault = async (provider) => {
     try {
-      const response = await apiClientWithAuth.patch("/ai/default-provider", {
-        provider: provider.id,
-      });
-      console.log(response.data);
+      const response = await apiClientWithAuth.patch(
+        `/cdn-configs/${provider.id}`
+      ); // ✅ Fix: use provider.id
+
+      console.log("Set default response:", response.data);
+
       toast({
         title: "Default provider updated",
-        description: `${provider.name} has been set as default`,
+        description: `${
+          provider.cloud_name || provider.name
+        } has been set as default`,
         variant: "default",
       });
+
       return true;
     } catch (error) {
-      console.error(error.response.data);
+      console.error(
+        "Set default error:",
+        error.response?.data || error.message
+      );
       toast({
         title: "Error updating default provider",
-        description: `${error.response.data.error}`,
+        description: `${error.response?.data?.error || "Unexpected error"}`,
         variant: "destructive",
       });
       return false;
     }
   };
-  const deleteProvider = async (provider) => {
+
+  const deleteProvider = async (id) => {
     try {
-      const response = await apiClientWithAuth.delete("/ai/provider-key", {
-        data: { provider: provider.id },
-      });
+      const response = await apiClientWithAuth.delete(`/cdn-configs/${id}`);
       console.log(response.data);
       toast({
         title: "Provider deleted",
-        description: `${provider.name} has been deleted`,
         variant: "default",
       });
       return true;
@@ -91,19 +106,28 @@ export default function useProvidersKey() {
     }
   };
 
-  const updateProviderKey = async (provider, maxToken, temperature) => {
+  const updateProviderKey = async (
+    id,
+    cloud_name,
+    api_key,
+    api_secret,
+    is_default
+  ) => {
     try {
-      const response = await apiClientWithAuth.patch("/ai/provider-key", {
-        provider:provider.id,
-        maxToken, temperature
+      const response = await apiClientWithAuth.patch(`/cdn-configs/${id}`, {
+        cloud_name,
+        api_key,
+        api_secret,
+        is_default,
       });
       console.log("response", response.data);
-     return response.data
+      return response.data;
     } catch (error) {
       console.error(error.response.data);
-      return error.response.data
+      return error.response.data || { success: false, error: "Unknown error" };
     }
   };
+
   return {
     getAllProviders,
     providers,
