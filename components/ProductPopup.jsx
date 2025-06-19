@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ShoppingCart, X } from 'lucide-react';
+import { useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -29,6 +30,22 @@ export default function ProductPopup({ annotation, onClose }) {
     }
   };
 
+  // ✅ Convert file to blob URL once
+  const imageSrc = useMemo(() => {
+    return annotation.image && typeof annotation.image !== 'string'
+      ? URL.createObjectURL(annotation.image)
+      : annotation.image || null;
+  }, [annotation.image]);
+
+  // ✅ Cleanup to avoid memory leak
+  useEffect(() => {
+    return () => {
+      if (imageSrc && typeof annotation.image !== 'string') {
+        URL.revokeObjectURL(imageSrc);
+      }
+    };
+  }, [imageSrc, annotation.image]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -41,9 +58,9 @@ export default function ProductPopup({ annotation, onClose }) {
           <div className="flex items-start space-x-3">
             {/* Product Image */}
             <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0 overflow-hidden">
-              {annotation.image ? (
-                <img 
-                  src={annotation.image} 
+              {imageSrc ? (
+                <img
+                  src={imageSrc}
                   alt={annotation.name}
                   className="w-full h-full object-cover"
                 />
@@ -62,14 +79,14 @@ export default function ProductPopup({ annotation, onClose }) {
               <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                 {annotation.description || 'Premium quality product available now'}
               </p>
-              
-              <Button 
-                size="sm" 
+
+              <Button
+                size="sm"
                 onClick={handleBuyNow}
                 className="mt-3 w-full text-xs h-8"
-                style={{ 
+                style={{
                   backgroundColor: annotation.backgroundColor,
-                  color: annotation.fontColor 
+                  color: annotation.fontColor,
                 }}
               >
                 Buy Now

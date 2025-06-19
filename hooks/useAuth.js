@@ -27,24 +27,6 @@ export default function useAuth() {
       setLoading(false);
     }
   };
-  // const register = async (credentials) => {
-  //   console.log("credentials", credentials);
-
-  //   setLoading(true);
-  //   try {
-  //     const response = await apiClient.post("accounts/signup", credentials);
-  //     console.log(response);
-  //     alert(
-  //       "A verification link has been sent to your email address, please click on that to access your account."
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //     setError(error.response.data.error);
-  //     throw Error(error.response.data.error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const register = async (credentials) => {
     console.log("credentials", credentials);
