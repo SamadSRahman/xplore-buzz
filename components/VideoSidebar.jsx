@@ -30,6 +30,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { toast } from "sonner";
 
 export default function VideoSidebar({
   video,
@@ -66,16 +67,35 @@ export default function VideoSidebar({
     endTime: Math.floor(currentTime) + 10,
   });
 
+  const hasOverlapWithOtherType = (newAnnotation, annotations) => {
+    return annotations.some((existing) => {
+      if (existing.id === newAnnotation.id) return false; // skip same
+      if (existing.type === newAnnotation.type) return false; // only check cross-type
+
+      // Check if ranges overlap
+      const overlap =
+        newAnnotation.startTime < existing.endTime &&
+        newAnnotation.endTime > existing.startTime;
+
+      return overlap;
+    });
+  };
+
   const handleProductSubmit = () => {
     if (!productForm.name || !productForm.url) return;
 
     const annotation = {
-      id: editingAnnotation?.id || uid(), // ✅ Use uid here
+      id: editingAnnotation?.id || uid(),
       type: "product",
       ...productForm,
     };
 
-    console.log("Submitting Product Annotation:", annotation);
+    if (hasOverlapWithOtherType(annotation, annotations)) {
+      toast.error(
+        "You can't use Product and Survey at the same timing. Please adjust the timing."
+      );
+      return;
+    }
 
     if (editingAnnotation) {
       onUpdateAnnotation(editingAnnotation.id, annotation);
@@ -102,11 +122,16 @@ export default function VideoSidebar({
 
     const annotation = {
       id: editingAnnotation?.id || uid(),
-      ...surveyForm, // ✅ merge all values
-      type: "survey", // ✅ ensure correct type after spreading
+      ...surveyForm,
+      type: "survey",
     };
 
-    console.log("Submitting Survey Annotation:", annotation);
+    if (hasOverlapWithOtherType(annotation, annotations)) {
+      toast.error(
+        "You can't use Product and Survey at the same timing. Please adjust the timing."
+      );
+      return;
+    }
 
     if (editingAnnotation) {
       onUpdateAnnotation(editingAnnotation.id, annotation);
