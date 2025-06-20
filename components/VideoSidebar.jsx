@@ -64,7 +64,7 @@ export default function VideoSidebar({
     type: "yes-no",
     options: ["Yes", "No"],
     startTime: Math.floor(currentTime),
-    endTime: Math.floor(currentTime) + 10,
+    endTime: Math.floor(currentTime) + 1, // Changed from +10 to +1
   });
 
   const hasOverlapWithOtherType = (newAnnotation, annotations) => {
@@ -81,6 +81,42 @@ export default function VideoSidebar({
     });
   };
 
+  // const handleProductSubmit = () => {
+  //   if (!productForm.name || !productForm.url) return;
+
+  //   const annotation = {
+  //     id: editingAnnotation?.id || uid(),
+  //     type: "product",
+  //     ...productForm,
+  //   };
+
+  //   if (hasOverlapWithOtherType(annotation, annotations)) {
+  //     toast.error(
+  //       "You can't use Product and Survey at the same timing. Please adjust the timing."
+  //     );
+  //     return;
+  //   }
+
+  //   if (editingAnnotation) {
+  //     onUpdateAnnotation(editingAnnotation.id, annotation);
+  //     setEditingAnnotation(null);
+  //   } else {
+  //     onAddAnnotation(annotation);
+  //   }
+
+  //   setProductForm({
+  //     name: "",
+  //     url: "",
+  //     startTime: Math.floor(currentTime),
+  //     endTime: Math.floor(currentTime) + 5,
+  //     image: null,
+  //     fontColor: "#FFFFFF",
+  //     backgroundColor: "#240CEF",
+  //     position: "bottom-right",
+  //   });
+  //   setIsEditing(false);
+  // };
+
   const handleProductSubmit = () => {
     if (!productForm.name || !productForm.url) return;
 
@@ -88,6 +124,8 @@ export default function VideoSidebar({
       id: editingAnnotation?.id || uid(),
       type: "product",
       ...productForm,
+      // Store the File object directly instead of converting to URL
+      image: productForm.image || null,
     };
 
     if (hasOverlapWithOtherType(annotation, annotations)) {
@@ -103,6 +141,8 @@ export default function VideoSidebar({
     } else {
       onAddAnnotation(annotation);
     }
+
+    // No need to create/revoke URLs here - let the display components handle it
 
     setProductForm({
       name: "",
@@ -126,6 +166,13 @@ export default function VideoSidebar({
       type: "survey",
     };
 
+    // ✅ Step 1: Validate start and end time
+    if (annotation.startTime >= annotation.endTime) {
+      toast.error("Survey start time must be less than end time.");
+      return;
+    }
+
+    // ✅ Step 2: Check for overlap with product annotations
     if (hasOverlapWithOtherType(annotation, annotations)) {
       toast.error(
         "You can't use Product and Survey at the same timing. Please adjust the timing."
@@ -133,6 +180,7 @@ export default function VideoSidebar({
       return;
     }
 
+    // ✅ Step 3: Proceed with add/update
     if (editingAnnotation) {
       onUpdateAnnotation(editingAnnotation.id, annotation);
       setEditingAnnotation(null);
@@ -140,13 +188,17 @@ export default function VideoSidebar({
       onAddAnnotation(annotation);
     }
 
+    // ✅ Step 4: Reset form safely
+    const newStartTime = Math.floor(currentTime);
+    const newEndTime = newStartTime + 10;
+
     setSurveyForm({
       question: "",
       type: "survey",
       surveyType: "yes-no",
       options: ["Yes", "No"],
-      startTime: Math.floor(currentTime),
-      endTime: Math.floor(currentTime) + 10,
+      startTime: newStartTime,
+      endTime: newEndTime,
     });
 
     setIsEditing(false);
@@ -254,7 +306,11 @@ export default function VideoSidebar({
                           <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
                             {annotation.image ? (
                               <img
-                                src={URL.createObjectURL(annotation.image)}
+                                src={
+                                  typeof annotation.image === "string"
+                                    ? annotation.image
+                                    : URL.createObjectURL(annotation.image)
+                                }
                                 alt="Product Thumbnail"
                                 className="w-full h-full object-cover"
                               />
@@ -690,13 +746,17 @@ export default function VideoSidebar({
                       const [mins, secs] = e.target.value
                         .split(":")
                         .map(Number);
+                      const newStart = (mins || 0) * 60 + (secs || 0);
+
                       setSurveyForm((prev) => ({
                         ...prev,
-                        startTime: (mins || 0) * 60 + (secs || 0),
+                        startTime: newStart,
+                        endTime: newStart + 1, // Always 1 second later
                       }));
                     }}
                     className="bg-gray-50 border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
                   />
+
                   <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 </div>
               </div>
