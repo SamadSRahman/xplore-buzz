@@ -36,7 +36,7 @@ export default function ForgotPasswordPage() {
 
       if (response.data.success) {
         toast.success('Reset link sent to your email');
-        router.push('/auth/login');
+        router.push('/login');
       } else {
         toast.error(response.data.error || 'Failed to send reset link');
       }
@@ -93,7 +93,7 @@ export default function ForgotPasswordPage() {
             <p className="text-sm text-gray-600">
               Remember your password?{' '}
               <Link
-                href="/auth/login"
+                href="/login"
                 className="text-purple-600 hover:text-purple-700 font-semibold"
               >
                 Sign in

@@ -6,8 +6,9 @@ import { toast } from "sonner";
 import VideoPlayer from "@/components/VideoPlayer";
 import IntervalEditor from "@/components/IntervalEditor";
 import VideoSidebar from "@/components/VideoSidebar";
-import { getVideoById } from "@/lib/api/video";
 import { Card } from "@/components/ui/card";
+import useVideo from "@/hooks/useVideo";
+import useCTA from "@/hooks/useCTA";
 
 export default function VideoPage({ params }) {
   const [video, setVideo] = useState(null);
@@ -17,16 +18,25 @@ export default function VideoPage({ params }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
 
-
+  const { getVideoById } = useVideo();
+  const { addCTA, deleteCTA, updateCTA } = useCTA();
   useEffect(() => {
     loadVideo();
   }, [params.id]);
+  useEffect(() => {
+    console.log("annotations updated", annotations)
+  }, [annotations]);
 
   const loadVideo = async () => {
     try {
       const videoData = await getVideoById(params.id);
-      setVideo(videoData);
-      setAnnotations(videoData.annotations || []);
+      setVideo(videoData.data);
+      setAnnotations(
+        videoData.data.videoProductsCTA.map((cta) => ({
+          ...cta,
+          type: "product",
+        })) || []
+      );
     } catch (error) {
       toast.error("Failed to load video");
       console.error(error);
@@ -35,27 +45,52 @@ export default function VideoPage({ params }) {
     }
   };
 
-  const handleAddAnnotation = (annotation) => {
+  const handleAddAnnotation = async (annotation) => {
+    console.log("annotation to be added", annotation);
+    if(annotation.type==="product"){
+       const result = await addCTA(annotation, params.id);
     const newAnnotation = {
-      id: Date.now() + Math.random(),
-      ...annotation,
+      type: "product",
+      ...result.data,
     };
     setAnnotations((prev) =>
       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
     );
+    }
+    else{
+      //need to call survey api here
+       setAnnotations((prev) =>
+      [...prev, annotation].sort((a, b) => a.startTime - b.startTime)
+    );
+    }
     toast.success("Annotation added successfully");
   };
 
-  const handleUpdateAnnotation = (id, updates) => {
-    setAnnotations((prev) =>
-      prev.map((ann) => (ann.id === id ? { ...ann, ...updates } : ann))
+  const handleUpdateAnnotation = async (annotation) => {
+    console.log("annotation to be updated",  annotation);
+  const result = await  updateCTA(annotation.id, annotation)
+   if(result.success){
+     setAnnotations((prev) =>
+      prev.map((ann) => (ann.id === annotation.id ? { ...ann, ...annotation } : ann))
     );
     toast.success("Annotation updated");
+   }
+   else{
+    console.log(result)
+     toast.error("Annotation update failed");
+   }
   };
 
-  const handleDeleteAnnotation = (id) => {
-    setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-    toast.success("Annotation deleted");
+  const handleDeleteAnnotation = async (id) => {
+    const result = await deleteCTA(id);
+    if (result.success) {
+      setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
+      toast.success("Annotation deleted");
+    }
+    else{
+      toast.error("Failed to delete annotation");
+      console.log(result);
+    }
   };
 
   const getActiveAnnotations = () => {
@@ -80,7 +115,7 @@ export default function VideoPage({ params }) {
             Video Not Found
           </h2>
           <p className="text-gray-600">
-            The video you're looking for doesn't exist.
+            The video you&apos;re looking for doesn&apos;t exist.
           </p>
         </Card>
       </div>
@@ -138,7 +173,8 @@ export default function VideoPage({ params }) {
             <div className="xl:col-span-3 space-y-6">
               <Card className="overflow-hidden bg-white shadow-lg">
                 <VideoPlayer
-                  src={video.src}
+                  thumbnail={video.thumbnailUrl}
+                  src={video.hlsUrl}
                   annotations={getActiveAnnotations()}
                   onTimeUpdate={setCurrentTime}
                   currentTime={currentTime}
@@ -174,6 +210,7 @@ export default function VideoPage({ params }) {
             {/* Sidebar */}
             <div className="xl:col-span-1">
               <VideoSidebar
+                id={params.id}
                 video={video}
                 annotations={annotations}
                 currentTime={currentTime}

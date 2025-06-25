@@ -61,7 +61,7 @@ export default function VerifyEmailPage() {
           <h2 className="text-center text-xl font-semibold text-green-700 mb-2">
             Email Verified Successfully!
           </h2>
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button className="w-full mt-4 bg-purple-gradient text-white">
               Continue to Sign In
             </Button>
@@ -84,7 +84,7 @@ export default function VerifyEmailPage() {
           <p className="text-center text-gray-600 mb-4">
             The verification link is invalid or expired.
           </p>
-          <Link href="/auth/login">
+          <Link href="/login">
             <Button variant="outline" className="w-full">
               Back to Sign In
             </Button>

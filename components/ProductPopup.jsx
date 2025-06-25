@@ -120,15 +120,15 @@ import { Card, CardContent } from '@/components/ui/card';
 
 export default function ProductPopup({ annotation, onClose }) {
   const [imageSrc, setImageSrc] = useState(null);
-
+  console.log("product popup annotation", annotation)
   useEffect(() => {
-    if (annotation.image) {
-      if (typeof annotation.image === 'string') {
+    if (annotation.imageUrl) {
+      if (typeof annotation.imageUrl === 'string') {
         // If it's already a string URL, use it directly
-        setImageSrc(annotation.image);
-      } else if (annotation.image instanceof File) {
+        setImageSrc(annotation.imageUrl);
+      } else if (annotation.imageUrl instanceof File) {
         // If it's a File object, create a blob URL
-        const blobUrl = URL.createObjectURL(annotation.image);
+        const blobUrl = URL.createObjectURL(annotation.imageUrl);
         setImageSrc(blobUrl);
         
         // Cleanup function to revoke the blob URL
@@ -139,7 +139,7 @@ export default function ProductPopup({ annotation, onClose }) {
     } else {
       setImageSrc(null);
     }
-  }, [annotation.image]);
+  }, [annotation.imageUrl]);
 
   const getPositionClasses = (position) => {
     switch (position) {
@@ -159,8 +159,8 @@ export default function ProductPopup({ annotation, onClose }) {
   };
 
   const handleBuyNow = () => {
-    if (annotation.url) {
-      window.open(annotation.url, '_blank');
+    if (annotation.productUrl) {
+      window.open(annotation.productUrl, '_blank');
     }
   };
 
@@ -179,7 +179,7 @@ export default function ProductPopup({ annotation, onClose }) {
               {imageSrc ? (
                 <img
                   src={imageSrc}
-                  alt={annotation.name || 'Product'}
+                  alt={annotation.productName || 'Product'}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     console.error('Image failed to load:', imageSrc);
@@ -199,7 +199,7 @@ export default function ProductPopup({ annotation, onClose }) {
             {/* Product Info */}
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-gray-900 text-sm truncate">
-                {annotation.name || 'Product'}
+                {annotation.productName || 'Product'}
               </h3>
               <p className="text-xs text-gray-600 mt-1 line-clamp-2">
                 {annotation.description || 'Premium quality product available now'}

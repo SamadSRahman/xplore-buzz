@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Hls from 'hls.js';
 import {
   Play,
   Pause,
@@ -17,6 +18,7 @@ import SurveyPopup from "./SurveyPopup";
 
 export default function VideoPlayer({
   src,
+  thumbnail,
   annotations = [],
   onTimeUpdate,
   currentTime,
@@ -38,10 +40,29 @@ export default function VideoPlayer({
   const [lastCurrentTime, setLastCurrentTime] = useState(0); // Track previous time for rewind detection
 
   // Sample video URL (replace with actual HLS stream)
-  const videoSrc =
-    src ||
-    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      // Safari
+      video.src = src;
+    } else if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(src);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        // optional: auto play
+      });
+      return () => {
+        hls.destroy();
+      };
+    } else {
+      // fallback
+      video.src = src;
+    }
+  }, [src]);
+// useEffect(()=>{console.log("annotations updated", annotations)},[annotations])
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -118,17 +139,17 @@ export default function VideoPlayer({
         !dismissedSurveyIds.has(a.id)
     );
 
-    console.log('📊 Survey check:', {
-      currentTime,
-      surveysInTimeRange: annotations.filter(a => 
-        a.type === "survey" && 
-        currentTime >= a.startTime && 
-        currentTime <= a.endTime
-      ).length,
-      completedIds: Array.from(completedSurveyIds),
-      dismissedIds: Array.from(dismissedSurveyIds),
-      validSurveys: currentSurveyAnnotations.length
-    });
+    // console.log('📊 Survey check:', {
+    //   currentTime,
+    //   surveysInTimeRange: annotations.filter(a => 
+    //     a.type === "survey" && 
+    //     currentTime >= a.startTime && 
+    //     currentTime <= a.endTime
+    //   ).length,
+    //   completedIds: Array.from(completedSurveyIds),
+    //   dismissedIds: Array.from(dismissedSurveyIds),
+    //   validSurveys: currentSurveyAnnotations.length
+    // });
 
     const newActiveSurveys = new Set(currentSurveyAnnotations.map((a) => a.id));
 
@@ -272,12 +293,11 @@ export default function VideoPlayer({
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
       {/* Video Element */}
-      <video
+       <video
         ref={videoRef}
-        src={videoSrc}
         className="w-full aspect-video"
         onClick={togglePlay}
-        // poster="https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750"
+        poster={thumbnail}
       />
 
       {/* Annotation Overlays */}

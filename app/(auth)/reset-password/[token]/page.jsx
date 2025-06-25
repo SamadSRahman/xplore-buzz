@@ -160,7 +160,7 @@ export default function ResetPasswordPage() {
           ) : tokenStatus !== 'valid' ? (
             <div className="text-center text-red-600">Invalid or expired token.</div>
           ) : isSuccess ? (
-            <Link href="/auth/login">
+            <Link href="/login">
               <Button className="w-full mt-4 bg-purple-gradient text-white">
                 Go to Login
               </Button>

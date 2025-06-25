@@ -61,7 +61,7 @@ export default function RegisterPage() {
       const result = await register({ name, email, password, confirmPassword });
       if (result.success) {
         toast.success("Account created successfully! Please sign in.");
-        router.push("/auth/login");
+        router.push("/login");
       }
     } catch (error) {
       toast.error(error.message || "Registration failed");
@@ -220,7 +220,7 @@ export default function RegisterPage() {
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
                 <Link
-                  href="/auth/login"
+                  href="/login"
                   className="text-purple-600 hover:text-purple-700 font-semibold"
                 >
                   Sign in

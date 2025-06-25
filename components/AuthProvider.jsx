@@ -29,7 +29,7 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!loading && isProtectedRoute && !user) {
-      router.push('/auth/login');
+      router.push('/login');
     }
   }, [user, loading, isProtectedRoute, router]);
 

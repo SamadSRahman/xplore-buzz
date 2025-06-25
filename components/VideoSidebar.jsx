@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { uid } from "uid";
 import {
@@ -13,6 +13,8 @@ import {
   Clock,
   Palette,
   MapPin,
+  Save,
+  PlusIcon,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,8 +33,10 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { toast } from "sonner";
+import useVideo from "@/hooks/useVideo";
 
 export default function VideoSidebar({
+  id,
   video,
   annotations,
   currentTime,
@@ -46,7 +50,7 @@ export default function VideoSidebar({
   const [isEditing, setIsEditing] = useState(false);
   const [editingAnnotation, setEditingAnnotation] = useState(null);
   const [thumbnailImage, setThumbnailImage] = useState(null);
-
+  const {updateVideo} = useVideo()
   // Form states
   const [productForm, setProductForm] = useState({
     name: "",
@@ -58,6 +62,12 @@ export default function VideoSidebar({
     backgroundColor: "#240CEF",
     position: "bottom-right",
   });
+
+  useEffect(()=>{
+    if(video.thumbnailUrl){
+      setThumbnailImage(video.thumbnailUrl)
+    }
+  },[video])
 
   const [surveyForm, setSurveyForm] = useState({
     question: "",
@@ -81,41 +91,7 @@ export default function VideoSidebar({
     });
   };
 
-  // const handleProductSubmit = () => {
-  //   if (!productForm.name || !productForm.url) return;
-
-  //   const annotation = {
-  //     id: editingAnnotation?.id || uid(),
-  //     type: "product",
-  //     ...productForm,
-  //   };
-
-  //   if (hasOverlapWithOtherType(annotation, annotations)) {
-  //     toast.error(
-  //       "You can't use Product and Survey at the same timing. Please adjust the timing."
-  //     );
-  //     return;
-  //   }
-
-  //   if (editingAnnotation) {
-  //     onUpdateAnnotation(editingAnnotation.id, annotation);
-  //     setEditingAnnotation(null);
-  //   } else {
-  //     onAddAnnotation(annotation);
-  //   }
-
-  //   setProductForm({
-  //     name: "",
-  //     url: "",
-  //     startTime: Math.floor(currentTime),
-  //     endTime: Math.floor(currentTime) + 5,
-  //     image: null,
-  //     fontColor: "#FFFFFF",
-  //     backgroundColor: "#240CEF",
-  //     position: "bottom-right",
-  //   });
-  //   setIsEditing(false);
-  // };
+ 
 
   const handleProductSubmit = () => {
     if (!productForm.name || !productForm.url) return;
@@ -142,7 +118,6 @@ export default function VideoSidebar({
       onAddAnnotation(annotation);
     }
 
-    // No need to create/revoke URLs here - let the display components handle it
 
     setProductForm({
       name: "",
@@ -213,7 +188,20 @@ export default function VideoSidebar({
   };
 
   const productAnnotations = annotations.filter((a) => a.type === "product");
+ async function handleAddThumbnail(){
+      if (!thumbnailImage) {
+        toast.error("Please select a thumbnail image.");
+        return;
+      }
 
+      try {
+        await updateVideo(id, thumbnailImage);
+        toast.success("Thumbnail added successfully!");
+      } catch (error) {
+        console.error("Error uploading thumbnail:", error);
+        toast.error("Failed to upload thumbnail.");
+      }
+    }
   return (
     <div className="space-y-4 h-fit">
       {/* Thumbnail Section */}
@@ -237,7 +225,7 @@ export default function VideoSidebar({
                 <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden relative">
                   {thumbnailImage ? (
                     <img
-                      src={URL.createObjectURL(thumbnailImage)}
+                      src={typeof thumbnailImage === 'string' ? thumbnailImage : URL.createObjectURL(thumbnailImage)}
                       alt="Thumbnail"
                       className="w-full h-full object-cover"
                     />
@@ -261,12 +249,10 @@ export default function VideoSidebar({
                   <Button
                     variant="outline"
                     className="w-full text-sm flex items-center justify-center"
-                    onClick={() => {
-                      document.querySelector('input[type="file"]').click();
-                    }}
+                    onClick={handleAddThumbnail}
                   >
-                    <Upload className="w-4 h-4 mr-2" />
-                    Upload from device
+                    <PlusIcon className="w-4 h-4 mr-2" />
+                    Add thumbnail to video
                   </Button>
                 </div>
               </div>
@@ -283,7 +269,7 @@ export default function VideoSidebar({
               <CardTitle className="flex items-center justify-between text-base">
                 {isEditing && editingAnnotation?.type === "product"
                   ? "Call to Action"
-                  : "Product (Call to Action)"}
+                  : "  (Call to Action)"}
                 {productOpen ? (
                   <ChevronUp className="w-4 h-4" />
                 ) : (
@@ -304,12 +290,12 @@ export default function VideoSidebar({
                           className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
                         >
                           <div className="w-12 h-12 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                            {annotation.image ? (
+                            {annotation.imageUrl ? (
                               <img
                                 src={
-                                  typeof annotation.image === "string"
-                                    ? annotation.image
-                                    : URL.createObjectURL(annotation.image)
+                                  typeof annotation.imageUrl === "string"
+                                    ? annotation.imageUrl
+                                    : URL.createObjectURL(annotation.imageUrl)
                                 }
                                 alt="Product Thumbnail"
                                 className="w-full h-full object-cover"
@@ -321,10 +307,10 @@ export default function VideoSidebar({
 
                           <div className="flex-1 min-w-0">
                             <p className="font-medium text-sm truncate">
-                              {annotation.name}
+                              {annotation.productName}
                             </p>
                             <p className="text-xs text-gray-500 truncate">
-                              {annotation.url}
+                              {annotation.productUrl}
                             </p>
                           </div>
                           <div className="text-xs text-gray-500">
@@ -434,7 +420,7 @@ export default function VideoSidebar({
 
                   <div>
                     <label className="block text-sm font-medium mb-2">
-                      Call to Action
+                      Product Image
                     </label>
 
                     <div className="aspect-video bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 mb-3 overflow-hidden relative group">

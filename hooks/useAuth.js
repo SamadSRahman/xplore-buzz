@@ -96,22 +96,23 @@ export default function useAuth() {
     }
   };
   const logout = async () => {
-    const user = JSON.parse(localStorage.getItem("user"));
     const token = localStorage.getItem("token");
     // api client not used due to token issue
     try {
       const response = await axios.post(
-        "https://prompthkit.apprikart.com/api/v1/accounts/logout",
-        {
-          email: user.email,
-        },
+        "https://prompthkit.apprikart.com/api/v1/xplore/accounts/logout",
+        {},
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
+      window.location.href = "/login"
+      localStorage.removeItem("token")
+      localStorage.removeItem("user")
       return response.data;
+      
     } catch (error) {
       console.error(error.response.data.error);
       return error.response.data;

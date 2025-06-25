@@ -84,7 +84,7 @@ export default function Home() {
                 Get Started
               </Button>
             </Link>
-            <Link href="/auth/login">
+            <Link href="/login">
               <Button variant="outline" size="lg" className="px-8 py-3 rounded-xl font-semibold">
                 Sign In
               </Button>

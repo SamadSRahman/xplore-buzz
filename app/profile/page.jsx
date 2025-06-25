@@ -11,7 +11,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-  const { user } = useAuth();
+  const user = JSON.parse(localStorage.getItem('user'))
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || 'Demo User',

@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useAuth } from '@/components/AuthProvider';
+import useAuth from '@/hooks/useAuth'
 
 const BuzzLogo = () => (
   <div className="flex items-center space-x-2">
@@ -28,8 +28,8 @@ const BuzzLogo = () => (
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
-  const { user, signOut } = useAuth();
-
+  const user = localStorage.getItem('user')
+  const {logout} = useAuth();
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'Upload', href: '/upload', icon: Upload, requireAuth: true },
@@ -53,7 +53,7 @@ export default function Navbar() {
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
-              if (item.requireAuth && !user) return null;
+           
               return (
                 <Link
                   key={item.name}
@@ -94,7 +94,7 @@ export default function Navbar() {
                   <DropdownMenuItem asChild>
                     <Link href="/profile">Profile</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={signOut}>
+                  <DropdownMenuItem onClick={logout}>
                     <LogOut className="w-4 h-4 mr-2" />
                     Sign Out
                   </DropdownMenuItem>
@@ -102,10 +102,10 @@ export default function Navbar() {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-2">
-                <Link href="/auth/login">
+                <Link href="/login">
                   <Button variant="ghost">Sign In</Button>
                 </Link>
-                <Link href="/auth/register">
+                <Link href="/register">
                   <Button className="bg-purple-gradient text-white">Sign Up</Button>
                 </Link>
               </div>
@@ -178,14 +178,14 @@ export default function Navbar() {
               ) : (
                 <div className="space-y-2 pt-2 border-t">
                   <Link
-                    href="/auth/login"
+                    href="/login"
                     onClick={() => setIsOpen(false)}
                     className="block px-3 py-2 rounded-lg text-gray-600 hover:text-purple-600 hover:bg-gray-50"
                   >
                     Sign In
                   </Link>
                   <Link
-                    href="/auth/register"
+                    href="/register"
                     onClick={() => setIsOpen(false)}
                     className="block px-3 py-2 rounded-lg bg-purple-gradient text-white text-center"
                   >
