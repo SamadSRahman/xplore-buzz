@@ -143,7 +143,7 @@ export default function UploadPage() {
                     <div className="flex flex-col text-left">
                       <span className="font-semibold truncate max-w-xs">{fileObj.name}</span>
                       <span className="text-xs text-gray-500">{formatSize(fileObj.size)}</span>
-                      {fileObj.status === 'uploading' && <Progress value={fileObj.progress} className="mt-1 h-2 rounded-full" />}
+                      {fileObj.status === 'uploading' && <Progress  value={fileObj.progress} className="mt-1 h-2 rounded-full" />}
                     </div>
                   </div>
                   <Button variant="ghost" size="sm" onClick={removeFile} disabled={uploading}><X className="w-5 h-5" /></Button>

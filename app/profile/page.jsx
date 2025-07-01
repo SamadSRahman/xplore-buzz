@@ -7,11 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
-import { useAuth } from '@/components/AuthProvider';
 import { toast } from 'sonner';
 
 export default function ProfilePage() {
-  const user = JSON.parse(localStorage.getItem('user'))
+let user = {}
+if(window!==undefined){
+  user = JSON.parse(localStorage.getItem('user'))
+}
+
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || 'Demo User',

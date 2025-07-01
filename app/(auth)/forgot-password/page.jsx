@@ -1,21 +1,36 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { apiClient } from '@/lib/axios'; // <-- direct import of your axios instance
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [apiClient, setApiClient] = useState(null);
   const router = useRouter();
+
+  // Dynamically import and setup API client on mount
+  useEffect(() => {
+    const setupApiClient = async () => {
+      const { apiClient: client } = await import('@/lib/axios');
+      setApiClient(client);
+    };
+    
+    setupApiClient();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!apiClient) {
+      toast.error('API client not ready');
+      return;
+    }
 
     if (!email) {
       toast.error('Please enter your email');
@@ -60,7 +75,7 @@ export default function ForgotPasswordPage() {
             </div>
             <h2 className="text-2xl font-bold">Forgot Password</h2>
             <p className="text-gray-600">
-              Enter your email and we'll send you a password reset link.
+              Enter your email and we&apos;ll send you a password reset link.
             </p>
           </div>
 
@@ -83,7 +98,7 @@ export default function ForgotPasswordPage() {
             <Button
               type="submit"
               className="w-full bg-purple-gradient text-white"
-              disabled={loading}
+              disabled={loading || !apiClient}
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </Button>

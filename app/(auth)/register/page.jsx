@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { signUp } from "@/lib/api/auth";
 import { toast } from "sonner";
 import useAuth from "@/hooks/useAuth";
 

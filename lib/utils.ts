@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
   
-export function formatTime(totalSeconds: number): string {
+export function formatTime(totalSeconds: number) {
   const mins = Math.floor(totalSeconds / 60);
   const secs = Math.floor(totalSeconds % 60);
   const mm = String(mins).padStart(2, '0');

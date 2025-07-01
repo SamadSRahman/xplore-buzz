@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
-import { apiClient, apiClientWithAuth } from "../lib/axios";
-import axios, { AxiosHeaders } from "axios";
+import  { useState } from "react";
+import { apiClient } from "../lib/axios";
+import axios from "axios";
 
 export default function useAuth() {
   const [loading, setLoading] = useState(false);
@@ -96,7 +96,10 @@ export default function useAuth() {
     }
   };
   const logout = async () => {
-    const token = localStorage.getItem("token");
+    let token = "";
+    if(window !== undefined){
+      localStorage.getItem("token");
+    }
     // api client not used due to token issue
     try {
       const response = await axios.post(

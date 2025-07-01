@@ -76,4 +76,3 @@ const updateVideo = async (id, thumbnail, title, description, video) => {
   }
   return {uploadVideo, getAllVideos, allVideos, getVideoById, updateVideo};
 }
-
