@@ -15,7 +15,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-
 import EditProductPopup from "./popups/EditCTAPopup";
 import EditSurveyPopup from "./popups/EditSurveyPopup";
 
@@ -27,7 +26,7 @@ export default function IntervalEditor({
   onUpdateAnnotation,
   onDeleteAnnotation,
 }) {
-   const [selectedAnnotation, setSelectedAnnotation] = useState(null);
+  const [selectedAnnotation, setSelectedAnnotation] = useState(null);
   const [editing, setEditing] = useState(false);
   const [editingType, setEditingType] = useState(null);
 
@@ -38,17 +37,29 @@ export default function IntervalEditor({
     }
   }, [selectedAnnotation]);
 
+  // const formatTime = (seconds) => {
+  //   console.log("format tim triggered with value", seconds);
+
+  //   const mins = Math.floor(seconds / 60);
+  //   const secs = Math.floor(seconds % 60);
+  //   return `${mins.toString().padStart(2, "0")}:
+  //     ${secs.toString().padStart(2, "0")}`;
+  // };
   const formatTime = (seconds) => {
+    console.log("format tim triggered with value", seconds);
+
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
-    return `${mins.toString().padStart(2, "0")}:
-      ${secs.toString().padStart(2, "0")}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
   };
   const getProgressPercentage = (time) =>
     videoDuration ? (time / videoDuration) * 100 : 0;
   const getAnnotationWidth = ({ startTime, endTime }) =>
     ((endTime - startTime) / videoDuration) * 100;
   const typeColor = { product: "bg-blue-500", survey: "bg-purple-500" };
+  
 
   const handleFieldChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -61,7 +72,7 @@ export default function IntervalEditor({
     setEditing(true);
   };
 
-    const handleCloseEdit = () => {
+  const handleCloseEdit = () => {
     setEditing(false);
     setEditingType(null);
   };
@@ -94,23 +105,26 @@ export default function IntervalEditor({
               style={{ width: `${getProgressPercentage(currentTime)}%` }}
             />
             {/* Annotation blocks */}
-            {annotations.map((a) => (
-              <motion.div
-                key={a.id}
-                whileHover={{ scaleX: 1.1 }}
-                className={`absolute top-0 h-full opacity-70 hover:opacity-90 cursor-pointer ${
-                  typeColor[a.type]
-                }`}
-                style={{
-                  left: `${getProgressPercentage(a.startTime)}%`,
-                  width: `${getAnnotationWidth(a)}%`,
-                }}
-                onClick={() => setSelectedAnnotation(a)}
-                title={`${
-                  a.type === "product" ? a.productName : a.question
-                }\n (${formatTime(a.startTime)} - ${formatTime(a.endTime)})`}
-              />
-            ))}
+            {annotations.map((a) => {
+              console.log("annotation list", a);
+              return (
+                <motion.div
+                  key={a.id}
+                  whileHover={{ scaleX: 1.1 }}
+                  className={`absolute top-0 h-full opacity-70 hover:opacity-90 cursor-pointer ${
+                    typeColor[a.type]
+                  }`}
+                  style={{
+                    left: `${getProgressPercentage(a.startTime)}%`,
+                    width: `${getAnnotationWidth(a)}%`,
+                  }}
+                  onClick={() => setSelectedAnnotation(a)}
+                  title={`${
+                    a.type === "product" ? a.productName : a.question
+                  }\n (${formatTime(a.startTime)} - ${formatTime(a.endTime)})`}
+                />
+              );
+            })}
           </div>
         </div>
 
@@ -164,7 +178,7 @@ export default function IntervalEditor({
                       className="text-red-500 hover:text-red-700 p-1"
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDeleteAnnotation(a.id);
+                        onDeleteAnnotation(a.id, a.type); // Pass both the id and type
                       }}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -175,12 +189,20 @@ export default function IntervalEditor({
                   {a.type === "product" ? a.productName : a.question}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  {formatTime(a.startTime)} - {formatTime(a.endTime)}
+                  {/* {a.type === "product"
+                    ? formatTime(a.startTime) - formatTime(a.endTime)
+                    : formatTime(a.selectTime) - formatTime(a.selectTime + 1)} */}
+
+                  {a.type === "product"
+                    ? formatTime(a.startTime) + " - " + formatTime(a.endTime)
+                    : formatTime(a.selectTime) +
+                      " - " +
+                      formatTime(a.selectTime + 1)}
                 </p>
               </motion.div>
             ))}
           </div>
-            {/* {selectedAnnotation && !editing && (
+          {/* {selectedAnnotation && !editing && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -228,9 +250,9 @@ export default function IntervalEditor({
               </div>
             </motion.div>
           )} */}
-          </div>
+        </div>
       </CardContent>
-              {editing && editingType === "product" && (
+      {editing && editingType === "product" && (
         <EditProductPopup
           open={true}
           selectedAnnotation={selectedAnnotation}
@@ -247,8 +269,6 @@ export default function IntervalEditor({
           onUpdate={handleUpdateAnnotation}
         />
       )}
-
     </Card>
   );
 }
- 

@@ -50,7 +50,7 @@ export default function VideoSidebar({
   const [isEditing, setIsEditing] = useState(false);
   const [editingAnnotation, setEditingAnnotation] = useState(null);
   const [thumbnailImage, setThumbnailImage] = useState(null);
-  const {updateVideo} = useVideo()
+  const { updateVideo } = useVideo();
   // Form states
   const [productForm, setProductForm] = useState({
     name: "",
@@ -63,11 +63,11 @@ export default function VideoSidebar({
     position: "bottom-right",
   });
 
-  useEffect(()=>{
-    if(video.thumbnailUrl){
-      setThumbnailImage(video.thumbnailUrl)
+  useEffect(() => {
+    if (video.thumbnailUrl) {
+      setThumbnailImage(video.thumbnailUrl);
     }
-  },[video])
+  }, [video]);
 
   const [surveyForm, setSurveyForm] = useState({
     question: "",
@@ -90,8 +90,6 @@ export default function VideoSidebar({
       return overlap;
     });
   };
-
- 
 
   const handleProductSubmit = () => {
     if (!productForm.name || !productForm.url) return;
@@ -118,7 +116,6 @@ export default function VideoSidebar({
       onAddAnnotation(annotation);
     }
 
-
     setProductForm({
       name: "",
       url: "",
@@ -139,6 +136,10 @@ export default function VideoSidebar({
       id: editingAnnotation?.id || uid(),
       ...surveyForm,
       type: "survey",
+      optionType: surveyForm.type, // ✅ add this!
+      question: surveyForm.question,
+      options: surveyForm.options,
+      correctAnswers: surveyForm.correctAnswers,
     };
 
     // ✅ Step 1: Validate start and end time
@@ -188,20 +189,20 @@ export default function VideoSidebar({
   };
 
   const productAnnotations = annotations.filter((a) => a.type === "product");
- async function handleAddThumbnail(){
-      if (!thumbnailImage) {
-        toast.error("Please select a thumbnail image.");
-        return;
-      }
-
-      try {
-        await updateVideo(id, thumbnailImage);
-        toast.success("Thumbnail added successfully!");
-      } catch (error) {
-        console.error("Error uploading thumbnail:", error);
-        toast.error("Failed to upload thumbnail.");
-      }
+  async function handleAddThumbnail() {
+    if (!thumbnailImage) {
+      toast.error("Please select a thumbnail image.");
+      return;
     }
+
+    try {
+      await updateVideo(id, thumbnailImage);
+      toast.success("Thumbnail added successfully!");
+    } catch (error) {
+      console.error("Error uploading thumbnail:", error);
+      toast.error("Failed to upload thumbnail.");
+    }
+  }
   return (
     <div className="space-y-4 h-fit">
       {/* Thumbnail Section */}
@@ -225,7 +226,11 @@ export default function VideoSidebar({
                 <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 overflow-hidden relative">
                   {thumbnailImage ? (
                     <img
-                      src={typeof thumbnailImage === 'string' ? thumbnailImage : URL.createObjectURL(thumbnailImage)}
+                      src={
+                        typeof thumbnailImage === "string"
+                          ? thumbnailImage
+                          : URL.createObjectURL(thumbnailImage)
+                      }
                       alt="Thumbnail"
                       className="w-full h-full object-cover"
                     />
@@ -637,6 +642,7 @@ export default function VideoSidebar({
                       type: value,
                       options: [],
                       newOption: "",
+                      correctAnswers: [],
                     }))
                   }
                 >
@@ -701,20 +707,70 @@ export default function VideoSidebar({
                   {/* Show existing options if any */}
                   <div className="space-y-2">
                     {surveyForm.options.map((opt, idx) => (
-                      <Input
+                      <div
                         key={idx}
-                        value={opt}
-                        onChange={(e) => {
-                          const updated = [...surveyForm.options];
-                          updated[idx] = e.target.value;
-                          setSurveyForm((prev) => ({
-                            ...prev,
-                            options: updated,
-                          }));
-                        }}
-                        placeholder={`Option ${idx + 1}`}
-                        className="bg-gray-50 border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
+                        className="flex items-center space-x-2 bg-gray-50 border border-gray-300 rounded p-2"
+                      >
+                        {/* Single-choice => Radio | Multiple-choice => Checkbox */}
+                        {surveyForm.type === "single-choice" ? (
+                          <input
+                            type="radio"
+                            checked={surveyForm.correctAnswers[0] === opt}
+                            onChange={() =>
+                              setSurveyForm((prev) => ({
+                                ...prev,
+                                correctAnswers: [opt], // only one correct answer
+                              }))
+                            }
+                          />
+                        ) : (
+                          <input
+                            type="checkbox"
+                            checked={surveyForm.correctAnswers?.includes(opt)}
+                            onChange={(e) => {
+                              const isChecked = e.target.checked;
+                              setSurveyForm((prev) => {
+                                let updated = prev.correctAnswers || [];
+                                if (isChecked) {
+                                  updated = [...updated, opt];
+                                } else {
+                                  updated = updated.filter((o) => o !== opt);
+                                }
+                                return { ...prev, correctAnswers: updated };
+                              });
+                            }}
+                          />
+                        )}
+
+                        {/* Editable option text */}
+                        <Input
+                          value={opt}
+                          onChange={(e) => {
+                            const updated = [...surveyForm.options];
+                            updated[idx] = e.target.value;
+
+                            // Also update correctAnswers if label changed
+                            const wasCorrect =
+                              surveyForm.correctAnswers?.includes(opt);
+                            let updatedCorrect = [
+                              ...(surveyForm.correctAnswers || []),
+                            ];
+                            if (wasCorrect) {
+                              updatedCorrect = updatedCorrect.map((a) =>
+                                a === opt ? e.target.value : a
+                              );
+                            }
+
+                            setSurveyForm((prev) => ({
+                              ...prev,
+                              options: updated,
+                              correctAnswers: updatedCorrect,
+                            }));
+                          }}
+                          placeholder={`Option ${idx + 1}`}
+                          className="flex-1 bg-transparent border-none"
+                        />
+                      </div>
                     ))}
                   </div>
                 </div>

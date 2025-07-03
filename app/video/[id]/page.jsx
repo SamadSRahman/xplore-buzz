@@ -9,6 +9,7 @@ import VideoSidebar from "@/components/VideoSidebar";
 import { Card } from "@/components/ui/card";
 import useVideo from "@/hooks/useVideo";
 import useCTA from "@/hooks/useCTA";
+import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
 
 export default function VideoPage({ params }) {
   const [video, setVideo] = useState(null);
@@ -20,23 +21,40 @@ export default function VideoPage({ params }) {
 
   const { getVideoById } = useVideo();
   const { addCTA, deleteCTA, updateCTA } = useCTA();
+  const {
+    addFeedBackQuestion,
+    deleteFeedBackQuestion,
+    updateFeedBackQuestion,
+  } = useFeedBackQuestion();
+
   useEffect(() => {
     loadVideo();
   }, [params.id]);
   useEffect(() => {
-    console.log("annotations updated", annotations)
+    console.log("annotations updated", annotations);
   }, [annotations]);
 
   const loadVideo = async () => {
     try {
       const videoData = await getVideoById(params.id);
+      console.log(videoData);
       setVideo(videoData.data);
-      setAnnotations(
+
+      const ctaArray =
         videoData.data.videoProductsCTA.map((cta) => ({
           ...cta,
           type: "product",
-        })) || []
-      );
+        })) || [];
+      const surveyArray =
+        videoData.data.videoFeedbackQuestions.map((cta) => ({
+          ...cta,
+          type: "survey",
+          startTime: cta.selectTime,
+          endTime: cta.selectTime + 1,
+        })) || [];
+
+      const allAnnotations = [...ctaArray, ...surveyArray];
+      setAnnotations(allAnnotations);
     } catch (error) {
       toast.error("Failed to load video");
       console.error(error);
@@ -45,50 +63,279 @@ export default function VideoPage({ params }) {
     }
   };
 
+  // const handleAddAnnotation = async (annotation) => {
+  //   console.log("annotation to be added", annotation);
+  //   if (annotation.type === "product") {
+  //     const result = await addCTA(annotation, params.id);
+  //     const newAnnotation = {
+  //       type: "product",
+  //       ...result.data,
+  //     };
+  //     setAnnotations((prev) =>
+  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
+  //     );
+  //   } else {
+  //     //need to call survey api here
+  //     setAnnotations((prev) =>
+  //       [...prev, annotation].sort((a, b) => a.startTime - b.startTime)
+  //     );
+  //   }
+  //   toast.success("Annotation added successfully");
+  // };
+
+  // const handleUpdateAnnotation = async (annotation) => {
+  //   console.log("annotation to be updated", annotation);
+  //   const result = await updateCTA(annotation.id, annotation);
+  //   if (result.success) {
+  //     setAnnotations((prev) =>
+  //       prev.map((ann) =>
+  //         ann.id === annotation.id ? { ...ann, ...annotation } : ann
+  //       )
+  //     );
+  //     toast.success("Annotation updated");
+  //   } else {
+  //     console.log(result);
+  //     toast.error("Annotation update failed");
+  //   }
+  // };
+
+  // const handleDeleteAnnotation = async (id) => {
+  //   const result = await deleteCTA(id);
+  //   if (result.success) {
+  //     setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
+  //     toast.success("Annotation deleted");
+  //   } else {
+  //     toast.error("Failed to delete annotation");
+  //     console.log(result);
+  //   }
+  // };
+
+  // const handleAddAnnotation = async (annotation) => {
+  //   console.log("annotation to be added", annotation);
+
+  //   if (annotation.type === "product") {
+  //     const result = await addCTA(annotation, params.id);
+
+  //     const newAnnotation = {
+  //       type: "product",
+  //       ...result.data,
+  //     };
+
+  //     setAnnotations((prev) =>
+  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
+  //     );
+
+  //     toast.success("CTA added successfully");
+  //   } else if (annotation.type === "survey") {
+  //     const questionPayload = {
+  //       question: annotation.question,
+  //       optionType: annotation.optionType,
+  //       options: annotation.options,
+  //       correctAnswers: annotation.correctAnswers,
+  //       selectTime: annotation.startTime,
+  //     };
+
+  //     const result = await addFeedBackQuestion(params.id, questionPayload);
+
+  //     // const newAnnotation = {
+  //     //   type: "survey",
+  //     //   startTime: annotation.startTime,
+  //     //   endTime: annotation.startTime + 1,
+  //     //   selectTime: annotation.startTime,
+  //     //   ...result.data,
+  //     // };
+
+  //     const newAnnotation = {
+  //     type: "survey",
+  //     selectTime: annotation.startTime, // only use selectTime
+  //     ...questionPayload,
+  //   };
+
+  //     setAnnotations((prev) =>
+  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
+  //     );
+
+  //     toast.success("Survey added successfully");
+  //   } else {
+  //     toast.error("Unknown annotation type");
+  //   }
+  // };
+
+  // const handleUpdateAnnotation = async (annotation) => {
+  //   console.log("annotation to be updated", annotation);
+
+  //   if (annotation.type === "product") {
+  //     const result = await updateCTA(annotation.id, annotation);
+
+  //     if (result.success) {
+  //       setAnnotations((prev) =>
+  //         prev.map((ann) =>
+  //           ann.id === annotation.id ? { ...ann, ...annotation } : ann
+  //         )
+  //       );
+  //       toast.success("CTA updated successfully");
+  //     } else {
+  //       console.log(result);
+  //       toast.error("CTA update failed");
+  //     }
+  //   } else if (annotation.type === "survey") {
+  //     // Build payload for feedback question
+  //     const questionPayload = {
+  //       question: annotation.question,
+  //       optionType: annotation.optionType,
+  //       options: annotation.options,
+  //       correctAnswers: annotation.correctAnswers,
+  //       selectTime: annotation.selectTime,
+  //     };
+
+  //     const result = await updateFeedBackQuestion(
+  //       annotation.id,
+  //       questionPayload
+  //     );
+
+  //     if (result.success) {
+  //       setAnnotations((prev) =>
+  //         prev.map((ann) =>
+  //           ann.id === annotation.id ? { ...ann, ...annotation } : ann
+  //         )
+  //       );
+  //       toast.success("Survey updated successfully");
+  //     } else {
+  //       console.log(result);
+  //       toast.error("Survey update failed");
+  //     }
+  //   } else {
+  //     toast.error("Unknown annotation type");
+  //   }
+  // };
+
   const handleAddAnnotation = async (annotation) => {
     console.log("annotation to be added", annotation);
-    if(annotation.type==="product"){
-       const result = await addCTA(annotation, params.id);
-    const newAnnotation = {
-      type: "product",
-      ...result.data,
-    };
-    setAnnotations((prev) =>
-      [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
-    );
+
+    if (annotation.type === "product") {
+      const result = await addCTA(annotation, params.id);
+      const newAnnotation = {
+        type: "product",
+        ...result.data,
+      };
+      setAnnotations((prev) =>
+        [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
+      );
+      toast.success("CTA added successfully");
+    } else if (annotation.type === "survey") {
+      const questionPayload = {
+        question: annotation.question,
+        optionType: annotation.optionType,
+        options: annotation.options,
+        correctAnswers: annotation.correctAnswers,
+        selectTime: annotation.startTime, // Map startTime to selectTime
+      };
+      const result = await addFeedBackQuestion(params.id, questionPayload);
+      const newAnnotation = {
+        type: "survey",
+        selectTime: questionPayload.selectTime,
+        ...questionPayload,
+      };
+      setAnnotations(
+        (prev) =>
+          [...prev, newAnnotation].sort((a, b) => a.selectTime - b.selectTime) // Sort by selectTime
+      );
+      toast.success("Survey added successfully");
+    } else {
+      toast.error("Unknown annotation type");
     }
-    else{
-      //need to call survey api here
-       setAnnotations((prev) =>
-      [...prev, annotation].sort((a, b) => a.startTime - b.startTime)
-    );
-    }
-    toast.success("Annotation added successfully");
   };
 
   const handleUpdateAnnotation = async (annotation) => {
-    console.log("annotation to be updated",  annotation);
-  const result = await  updateCTA(annotation.id, annotation)
-   if(result.success){
-     setAnnotations((prev) =>
-      prev.map((ann) => (ann.id === annotation.id ? { ...ann, ...annotation } : ann))
-    );
-    toast.success("Annotation updated");
-   }
-   else{
-    console.log(result)
-     toast.error("Annotation update failed");
-   }
+    console.log("annotation to be updated", annotation);
+
+    if (annotation.type === "product") {
+      const result = await updateCTA(annotation.id, annotation);
+
+      if (result.success) {
+        setAnnotations((prev) =>
+          prev.map((ann) =>
+            ann.id === annotation.id ? { ...ann, ...annotation } : ann
+          )
+        );
+        toast.success("CTA updated successfully");
+      } else {
+        console.log(result);
+        toast.error("CTA update failed");
+      }
+    } else if (annotation.type === "survey") {
+      // Build payload for feedback question
+      const questionPayload = {
+        question: annotation.question,
+        optionType: annotation.optionType,
+        options: annotation.options,
+        correctAnswers: annotation.correctAnswers,
+        selectTime: annotation.selectTime,
+      };
+
+      const result = await updateFeedBackQuestion(
+        annotation.id,
+        questionPayload
+      );
+
+      if (result.success) {
+        setAnnotations((prev) =>
+          prev.map((ann) =>
+            ann.id === annotation.id ? { ...ann, ...annotation } : ann
+          )
+        );
+        toast.success("Survey updated successfully");
+      } else {
+        console.log(result);
+        toast.error("Survey update failed");
+      }
+    } else {
+      toast.error("Unknown annotation type");
+    }
   };
 
-  const handleDeleteAnnotation = async (id) => {
-    const result = await deleteCTA(id);
-    if (result.success) {
-      setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-      toast.success("Annotation deleted");
+  // const handleDeleteAnnotation = async (id, type) => {
+  //   let result;
+
+  //   if (type === "product") {
+  //     result = await deleteCTA(id);
+  //   } else if (type === "survey") {
+  //     result = await deleteFeedBackQuestion(id);
+  //   } else {
+  //     toast.error("Unknown annotation type");
+  //     return;
+  //   }
+
+  //   if (result.success) {
+  //     setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
+  //     toast.success(
+  //       `${type === "product" ? "CTA" : "Survey"} deleted successfully`
+  //     );
+  //   } else {
+  //     toast.error(`Failed to delete ${type === "product" ? "CTA" : "Survey"}`);
+  //     console.log(result);
+  //   }
+  // };
+
+  const handleDeleteAnnotation = async (id, type) => {
+    let result;
+
+    if (type === "product") {
+      result = await deleteCTA(id); // Delete product CTA
+    } else if (type === "survey") {
+      result = await deleteFeedBackQuestion(id); // Delete feedback question
+    } else {
+      toast.error("Unknown annotation type");
+      return;
     }
-    else{
-      toast.error("Failed to delete annotation");
+
+    if (result.success) {
+      setAnnotations((prev) => prev.filter((ann) => ann.id !== id)); // Remove from annotations
+      toast.success(
+        `${type === "product" ? "CTA" : "Survey"} deleted successfully`
+      );
+    } else {
+      toast.error(`Failed to delete ${type === "product" ? "CTA" : "Survey"}`);
       console.log(result);
     }
   };
