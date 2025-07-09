@@ -18,19 +18,24 @@
 // import { Clock, Plus, Edit, Trash2, X } from "lucide-react";
 // import { Button } from "@/components/ui/button";
 // import { useState, useEffect } from "react";
+// import { toast } from "sonner";
 
 // function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
 //   const [form, setForm] = useState({});
 //   const [newOption, setNewOption] = useState("");
 
 //   useEffect(() => {
+//     console.log("Selected Annotation:", selectedAnnotation);
 //     if (selectedAnnotation) {
 //       setForm({
 //         question: selectedAnnotation.question || "",
-//         type: selectedAnnotation.type || "single-choice",
+//         type: selectedAnnotation.optionType || "single-choice", // Changed from 'type' to 'optionType'
 //         options: selectedAnnotation.options || [],
 //         startTime: selectedAnnotation.startTime,
 //         endTime: selectedAnnotation.endTime,
+//         correctAnswers: selectedAnnotation.correctAnswers || [],
+//         fontColor: selectedAnnotation.fontColor || "#FFFFFF",
+//         backgroundColor: selectedAnnotation.backgroundColor || "#00000080",
 //       });
 //       setNewOption("");
 //     }
@@ -52,11 +57,36 @@
 //     const trimmed = newOption.trim();
 //     if (!trimmed || form.options.includes(trimmed)) return;
 
-//     setForm((prev) => ({
-//       ...prev,
-//       options: [...prev.options, trimmed],
-//     }));
+//     setForm((prev) => {
+//       const updatedOptions = [...prev.options, trimmed];
+//       // Remove invalid correct answers that are not in the new options
+//       const updatedCorrectAnswers = prev.correctAnswers.filter((answer) =>
+//         updatedOptions.includes(answer)
+//       );
+
+//       return {
+//         ...prev,
+//         options: updatedOptions,
+//         correctAnswers: updatedCorrectAnswers,
+//       };
+//     });
 //     setNewOption("");
+//   };
+
+//   const removeOption = (index) => {
+//     const updated = form.options.filter((_, i) => i !== index);
+//     // Remove correct answers that are no longer in the options
+//     setForm((prev) => {
+//       const updatedCorrectAnswers = prev.correctAnswers.filter((answer) =>
+//         updated.includes(answer)
+//       );
+
+//       return {
+//         ...prev,
+//         options: updated,
+//         correctAnswers: updatedCorrectAnswers,
+//       };
+//     });
 //   };
 
 //   const updateOption = (index, value) => {
@@ -65,21 +95,13 @@
 //     setForm((prev) => ({ ...prev, options: updated }));
 //   };
 
-//   const removeOption = (index) => {
-//     const updated = form.options.filter((_, i) => i !== index);
-//     setForm((prev) => ({ ...prev, options: updated }));
-//   };
-
-//   // const handleSubmit = () => {
-//   //   const updatedAnnotation = {
-//   //     ...selectedAnnotation,
-//   //     ...form
-//   //   };
-//   //   onUpdate(updatedAnnotation);
-//   //   onClose();
-//   // };
-
 //   const handleSubmit = () => {
+//     // Ensure type is valid
+//     if (!["single-choice", "multiple-choice"].includes(form.type)) {
+//       toast.error("Unknown annotation type.");
+//       return;
+//     }
+
 //     // Ensure correctAnswers is an array if it is undefined
 //     const correctAnswers = form.correctAnswers || [];
 
@@ -95,7 +117,15 @@
 
 //     const updatedAnnotation = {
 //       ...selectedAnnotation,
-//       ...form,
+//       question: form.question,
+//       optionType: form.type, // Map back to 'optionType'
+//       options: form.options,
+//       correctAnswers: form.correctAnswers,
+//       startTime: form.startTime,
+//       selectTime: form.startTime,
+//       endTime: form.endTime,
+//       fontColor: form.fontColor,
+//       backgroundColor: form.backgroundColor,
 //     };
 //     onUpdate(updatedAnnotation);
 //     onClose();
@@ -104,7 +134,7 @@
 //   if (!selectedAnnotation) return null;
 
 //   return (
-//     <Dialog open={open} onOpenChange={onClose}>
+//     <Dialog className="h-max-screen" open={open} onOpenChange={onClose}>
 //       <DialogContent className="max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 z-50">
 //         <DialogHeader>
 //           <DialogTitle>Edit Survey Question</DialogTitle>
@@ -180,6 +210,55 @@
 //                   </div>
 //                 ))}
 //               </div>
+
+//               {/* Correct Answers */}
+//               <Label>Correct Answers</Label>
+//               {form.type === "single-choice" ? (
+//                 <div className="space-y-2">
+//                   {form.options.map((opt, idx) => (
+//                     <div key={idx} className="flex items-center space-x-2">
+//                       <input
+//                         type="radio"
+//                         name="correctAnswer"
+//                         checked={form.correctAnswers[0] === opt}
+//                         onChange={() => {
+//                           setForm((prev) => ({
+//                             ...prev,
+//                             correctAnswers: [opt], // Only one correct answer for single-choice
+//                           }));
+//                         }}
+//                       />
+//                       <span>{opt}</span>
+//                     </div>
+//                   ))}
+//                 </div>
+//               ) : (
+//                 <div className="space-y-2">
+//                   {form.options.map((opt, idx) => (
+//                     <div key={idx} className="flex items-center space-x-2">
+//                       <input
+//                         type="checkbox"
+//                         checked={form.correctAnswers.includes(opt)}
+//                         onChange={(e) => {
+//                           const isChecked = e.target.checked;
+//                           setForm((prev) => {
+//                             let updated = [...prev.correctAnswers];
+//                             if (isChecked) {
+//                               updated.push(opt);
+//                             } else {
+//                               updated = updated.filter(
+//                                 (answer) => answer !== opt
+//                               );
+//                             }
+//                             return { ...prev, correctAnswers: updated };
+//                           });
+//                         }}
+//                       />
+//                       <span>{opt}</span>
+//                     </div>
+//                   ))}
+//                 </div>
+//               )}
 //             </div>
 //           )}
 
@@ -203,6 +282,36 @@
 //               />
 //               <Clock className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
 //             </div>
+//           </div>
+
+//           {/* Font Color */}
+//           <div>
+//             <Label htmlFor="fontColor">Font Color</Label>
+//             <Input
+//               id="fontColor"
+//               type="color"
+//               value={form.fontColor}
+//               onChange={(e) => handleChange("fontColor", e.target.value)}
+//               className="w-20 h-8 bg-gray-50 border border-gray-300"
+//             />
+//           </div>
+
+//           {/* Background Color */}
+//           <div>
+//             <Label htmlFor="backgroundColor">Background Color</Label>
+//             <Input
+//               id="backgroundColor"
+//               type="color"
+//               value={
+//                 form.backgroundColor
+//                   ? form.backgroundColor.slice(0, 7)
+//                   : "#000000"
+//               }
+//               onChange={(e) =>
+//                 handleChange("backgroundColor", e.target.value + "80")
+//               }
+//               className="w-20 h-8 bg-gray-50 border border-gray-300"
+//             />
 //           </div>
 //         </div>
 //         <DialogFooter>
@@ -244,7 +353,7 @@ import {
 import { Clock, Plus, Edit, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { toast } from "sonner"; // Make sure to import toast here
+import { toast } from "sonner";
 
 function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
   const [form, setForm] = useState({});
@@ -255,11 +364,11 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
     if (selectedAnnotation) {
       setForm({
         question: selectedAnnotation.question || "",
-        type: selectedAnnotation.type || "single-choice", // Ensure type is initialized properly
+        type: selectedAnnotation.optionType || "single-choice", // Changed from 'type' to 'optionType'
         options: selectedAnnotation.options || [],
         startTime: selectedAnnotation.startTime,
         endTime: selectedAnnotation.endTime,
-        correctAnswers: selectedAnnotation.correctAnswers || [], // ensure it's initialized
+        correctAnswers: selectedAnnotation.correctAnswers || [],
       });
       setNewOption("");
     }
@@ -277,17 +386,6 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
       .padStart(2, "0")}`;
   };
 
-  // const addOption = () => {
-  //   const trimmed = newOption.trim();
-  //   if (!trimmed || form.options.includes(trimmed)) return;
-
-  //   setForm((prev) => ({
-  //     ...prev,
-  //     options: [...prev.options, trimmed],
-  //   }));
-  //   setNewOption("");
-  // };
-
   const addOption = () => {
     const trimmed = newOption.trim();
     if (!trimmed || form.options.includes(trimmed)) return;
@@ -302,7 +400,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
       return {
         ...prev,
         options: updatedOptions,
-        correctAnswers: updatedCorrectAnswers, // sync correctAnswers
+        correctAnswers: updatedCorrectAnswers,
       };
     });
     setNewOption("");
@@ -330,59 +428,6 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
     setForm((prev) => ({ ...prev, options: updated }));
   };
 
-  // const removeOption = (index) => {
-  //   const updated = form.options.filter((_, i) => i !== index);
-  //   setForm((prev) => ({ ...prev, options: updated }));
-  // };
-
-  // const handleSubmit = () => {
-  //   // Ensure correctAnswers is an array if it is undefined
-  //   const correctAnswers = form.correctAnswers || [];
-
-  //   // Ensure all correct answers are part of the options array
-  //   const isValid = correctAnswers.every((answer) =>
-  //     form.options.includes(answer)
-  //   );
-
-  //   if (!isValid) {
-  //     toast.error("Correct answers must be one of the provided options.");
-  //     return;
-  //   }
-
-  //   const updatedAnnotation = {
-  //     ...selectedAnnotation,
-  //     ...form,
-  //   };
-  //   onUpdate(updatedAnnotation);
-  //   onClose();
-  // };
-
-  const handleCheckboxChange = (e, opt) => {
-    const isChecked = e.target.checked;
-
-    setForm((prev) => {
-      let updatedCorrectAnswers = [...prev.correctAnswers];
-      if (isChecked) {
-        updatedCorrectAnswers.push(opt);
-      } else {
-        updatedCorrectAnswers = updatedCorrectAnswers.filter(
-          (answer) => answer !== opt
-        );
-      }
-
-      // Ensure correctAnswers only contain valid options
-      const isValid = updatedCorrectAnswers.every((answer) =>
-        prev.options.includes(answer)
-      );
-
-      if (!isValid) {
-        toast.error("Correct answers must be one of the provided options.");
-      }
-
-      return { ...prev, correctAnswers: updatedCorrectAnswers };
-    });
-  };
-
   const handleSubmit = () => {
     // Ensure type is valid
     if (!["single-choice", "multiple-choice"].includes(form.type)) {
@@ -405,7 +450,13 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
 
     const updatedAnnotation = {
       ...selectedAnnotation,
-      ...form,
+      question: form.question,
+      optionType: form.type, // Map back to 'optionType'
+      options: form.options,
+      correctAnswers: form.correctAnswers,
+      startTime: form.startTime,
+      selectTime: form.startTime,
+      endTime: form.endTime,
     };
     onUpdate(updatedAnnotation);
     onClose();
@@ -414,12 +465,15 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
   if (!selectedAnnotation) return null;
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 z-50">
+    <Dialog className="h-max-screen" open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 z-50">
         <DialogHeader>
-          <DialogTitle>Edit Survey Question</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-50">
+            Edit Survey Question
+          </DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+
+        <div className="space-y-3">
           <div>
             <Label htmlFor="question">Question</Label>
             <Textarea
@@ -427,7 +481,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
               placeholder="Enter your question"
               value={form.question}
               onChange={(e) => handleChange("question", e.target.value)}
-              className="min-h-[80px] bg-gray-50 border border-gray-300"
+              className="min-h-[60px] bg-gray-50 border border-gray-300"
             />
           </div>
 
@@ -448,7 +502,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
           </div>
 
           {["single-choice", "multiple-choice"].includes(form.type) && (
-            <div className="space-y-3">
+            <div className="space-y-2">
               <Label>Options</Label>
 
               {/* Add new option */}
@@ -492,64 +546,55 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
               </div>
 
               {/* Correct Answers */}
-              <Label>Correct Answers</Label>
-              {form.type === "single-choice" ? (
-                <div className="space-y-2">
-                  {form.options.map((opt, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <input
-                        type="radio"
-                        name="correctAnswer"
-                        checked={form.correctAnswers[0] === opt}
-                        onChange={() => {
-                          // setForm((prev) => ({
-                          //   ...prev,
-                          //   correctAnswers: [opt], // Only one correct answer for single-choice
-                          // }));
-                          setForm((prev) => {
-                            let updated = [...prev.correctAnswers];
-                            if (isChecked) {
-                              updated.push(opt);
-                            } else {
-                              updated = updated.filter(
-                                (answer) => answer !== opt
-                              );
-                            }
-                            return { ...prev, correctAnswers: updated };
-                          });
-                        }}
-                      />
-                      <span>{opt}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {form.options.map((opt, idx) => (
-                    <div key={idx} className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={form.correctAnswers.includes(opt)}
-                        onChange={(e) => {
-                          const isChecked = e.target.checked;
-                          setForm((prev) => {
-                            let updated = [...prev.correctAnswers];
-                            if (isChecked) {
-                              updated.push(opt);
-                            } else {
-                              updated = updated.filter(
-                                (answer) => answer !== opt
-                              );
-                            }
-                            return { ...prev, correctAnswers: updated };
-                          });
-                        }}
-                      />
-                      <span>{opt}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <div className="space-y-2">
+                <Label>Correct Answers</Label>
+                {form.type === "single-choice" ? (
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
+                    {form.options.map((opt, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <input
+                          type="radio"
+                          name="correctAnswer"
+                          checked={form.correctAnswers[0] === opt}
+                          onChange={() => {
+                            setForm((prev) => ({
+                              ...prev,
+                              correctAnswers: [opt], // Only one correct answer for single-choice
+                            }));
+                          }}
+                        />
+                        <span className="text-sm">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-1 max-h-24 overflow-y-auto">
+                    {form.options.map((opt, idx) => (
+                      <div key={idx} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          checked={form.correctAnswers.includes(opt)}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+                            setForm((prev) => {
+                              let updated = [...prev.correctAnswers];
+                              if (isChecked) {
+                                updated.push(opt);
+                              } else {
+                                updated = updated.filter(
+                                  (answer) => answer !== opt
+                                );
+                              }
+                              return { ...prev, correctAnswers: updated };
+                            });
+                          }}
+                        />
+                        <span className="text-sm">{opt}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -575,17 +620,19 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
             </div>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleSubmit}
-            className="bg-purple-600 hover:bg-purple-700"
-            disabled={!form.question}
-          >
-            Save Changes
-          </Button>
+        <DialogFooter className="pt-4">
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              className="bg-purple-600 hover:bg-purple-700"
+              disabled={!form.question}
+            >
+              Save Changes
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

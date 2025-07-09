@@ -6,13 +6,13 @@ import { apiClientWithAuth } from "../lib/axios";
 export default function useVideo() {
     const [allVideos, setAllVideos] = useState([]);
   const uploadVideo = async (video, title, description) => {
-    console.log("params received", video, title, description);
+    // console.log("params received", video, title, description);
     
     const formData = new FormData();
     formData.append("video", video);
     formData.append("description", description);
     formData.append("title", title);
-    console.log("form data", formData);
+    // console.log("form data", formData);
     
     try {
     const response =   await apiClientWithAuth.post(
@@ -35,7 +35,7 @@ export default function useVideo() {
   const getAllVideos = async () => {
     try {
         const response = await apiClientWithAuth.get("/videos");
-        console.log("response", response.data);
+        // console.log("response", response.data);
         setAllVideos(response.data.data.videos)
         return response.data;
     } catch (error) {
@@ -47,7 +47,7 @@ export default function useVideo() {
   const getVideoById = async (id) => {
     try {
         const response = await apiClientWithAuth.get('videos/'+id);
-        console.log('response for one vidoe', response.data)
+        // console.log('response for one vidoe', response.data)
         return response.data
     } catch (error) {
           console.error("Error fetching video:", error);
@@ -67,7 +67,7 @@ const updateVideo = async (id, thumbnail, title, description, video) => {
                 "Content-Type": "multipart/form-data"
             }
         })
-        console.log('response from update video', response.data)    
+        // console.log('response from update video', response.data)    
         return response.data
     } catch (error) {
         console.error("error updated video", error.response.data)

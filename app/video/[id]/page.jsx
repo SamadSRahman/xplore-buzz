@@ -31,13 +31,13 @@ export default function VideoPage({ params }) {
     loadVideo();
   }, [params.id]);
   useEffect(() => {
-    console.log("annotations updated", annotations);
+    // console.log("annotations updated", annotations);
   }, [annotations]);
 
   const loadVideo = async () => {
     try {
       const videoData = await getVideoById(params.id);
-      console.log(videoData);
+      // console.log(videoData);
       setVideo(videoData.data);
 
       const ctaArray =
@@ -210,7 +210,7 @@ export default function VideoPage({ params }) {
   // };
 
   const handleAddAnnotation = async (annotation) => {
-    console.log("annotation to be added", annotation);
+    // console.log("annotation to be added", annotation);
 
     if (annotation.type === "product") {
       const result = await addCTA(annotation, params.id);
@@ -231,14 +231,17 @@ export default function VideoPage({ params }) {
         selectTime: annotation.startTime, // Map startTime to selectTime
       };
       const result = await addFeedBackQuestion(params.id, questionPayload);
+      // console.log("line 234", result)
       const newAnnotation = {
-        type: "survey",
-        selectTime: questionPayload.selectTime,
-        ...questionPayload,
+       ...result,
+       type:'survey',
+        startTime: annotation.startTime,
+        selectTime: annotation.startTime,
+          endTime: annotation.startTime + 1,
       };
       setAnnotations(
         (prev) =>
-          [...prev, newAnnotation].sort((a, b) => a.selectTime - b.selectTime) // Sort by selectTime
+          [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime) // Sort by selectTime
       );
       toast.success("Survey added successfully");
     } else {
@@ -247,7 +250,7 @@ export default function VideoPage({ params }) {
   };
 
   const handleUpdateAnnotation = async (annotation) => {
-    console.log("annotation to be updated", annotation);
+    // console.log("annotation to be updated", annotation);
 
     if (annotation.type === "product") {
       const result = await updateCTA(annotation.id, annotation);
@@ -260,7 +263,7 @@ export default function VideoPage({ params }) {
         );
         toast.success("CTA updated successfully");
       } else {
-        console.log(result);
+        // console.log(result);
         toast.error("CTA update failed");
       }
     } else if (annotation.type === "survey") {
@@ -286,7 +289,7 @@ export default function VideoPage({ params }) {
         );
         toast.success("Survey updated successfully");
       } else {
-        console.log(result);
+        // console.log(result);
         toast.error("Survey update failed");
       }
     } else {
@@ -336,7 +339,7 @@ export default function VideoPage({ params }) {
       );
     } else {
       toast.error(`Failed to delete ${type === "product" ? "CTA" : "Survey"}`);
-      console.log(result);
+      // console.log(result);
     }
   };
 

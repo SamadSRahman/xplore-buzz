@@ -107,7 +107,7 @@ export const useFeedBackQuestion = () => {
         status: response.status,
         data: response.data,
       });
-      return response.data;
+      return response.data.data;
     } catch (error) {
       console.error(
         "Error adding feedback question:",

@@ -46,7 +46,7 @@ export default function IntervalEditor({
   //     ${secs.toString().padStart(2, "0")}`;
   // };
   const formatTime = (seconds) => {
-    console.log("format tim triggered with value", seconds);
+    // console.log("format tim triggered with value", seconds);
 
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
@@ -106,7 +106,7 @@ export default function IntervalEditor({
             />
             {/* Annotation blocks */}
             {annotations.map((a) => {
-              console.log("annotation list", a);
+              // console.log("annotation list", a);
               return (
                 <motion.div
                   key={a.id}
