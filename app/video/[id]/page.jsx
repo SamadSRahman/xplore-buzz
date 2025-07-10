@@ -27,15 +27,25 @@ export default function VideoPage({ params }) {
     updateFeedBackQuestion,
   } = useFeedBackQuestion();
 
+  // useEffect(() => {
+  //   loadVideo();
+  // }, [params.id]);
+
   useEffect(() => {
+    if (!params?.id) {
+      console.log("Waiting for params.id...");
+      return;
+    }
     loadVideo();
   }, [params.id]);
+
   useEffect(() => {
     // console.log("annotations updated", annotations);
   }, [annotations]);
 
   const loadVideo = async () => {
     try {
+      if (!params?.id) return; // ✅ extra safety
       const videoData = await getVideoById(params.id);
       // console.log(videoData);
       setVideo(videoData.data);
@@ -63,152 +73,6 @@ export default function VideoPage({ params }) {
     }
   };
 
-  // const handleAddAnnotation = async (annotation) => {
-  //   console.log("annotation to be added", annotation);
-  //   if (annotation.type === "product") {
-  //     const result = await addCTA(annotation, params.id);
-  //     const newAnnotation = {
-  //       type: "product",
-  //       ...result.data,
-  //     };
-  //     setAnnotations((prev) =>
-  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
-  //     );
-  //   } else {
-  //     //need to call survey api here
-  //     setAnnotations((prev) =>
-  //       [...prev, annotation].sort((a, b) => a.startTime - b.startTime)
-  //     );
-  //   }
-  //   toast.success("Annotation added successfully");
-  // };
-
-  // const handleUpdateAnnotation = async (annotation) => {
-  //   console.log("annotation to be updated", annotation);
-  //   const result = await updateCTA(annotation.id, annotation);
-  //   if (result.success) {
-  //     setAnnotations((prev) =>
-  //       prev.map((ann) =>
-  //         ann.id === annotation.id ? { ...ann, ...annotation } : ann
-  //       )
-  //     );
-  //     toast.success("Annotation updated");
-  //   } else {
-  //     console.log(result);
-  //     toast.error("Annotation update failed");
-  //   }
-  // };
-
-  // const handleDeleteAnnotation = async (id) => {
-  //   const result = await deleteCTA(id);
-  //   if (result.success) {
-  //     setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-  //     toast.success("Annotation deleted");
-  //   } else {
-  //     toast.error("Failed to delete annotation");
-  //     console.log(result);
-  //   }
-  // };
-
-  // const handleAddAnnotation = async (annotation) => {
-  //   console.log("annotation to be added", annotation);
-
-  //   if (annotation.type === "product") {
-  //     const result = await addCTA(annotation, params.id);
-
-  //     const newAnnotation = {
-  //       type: "product",
-  //       ...result.data,
-  //     };
-
-  //     setAnnotations((prev) =>
-  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
-  //     );
-
-  //     toast.success("CTA added successfully");
-  //   } else if (annotation.type === "survey") {
-  //     const questionPayload = {
-  //       question: annotation.question,
-  //       optionType: annotation.optionType,
-  //       options: annotation.options,
-  //       correctAnswers: annotation.correctAnswers,
-  //       selectTime: annotation.startTime,
-  //     };
-
-  //     const result = await addFeedBackQuestion(params.id, questionPayload);
-
-  //     // const newAnnotation = {
-  //     //   type: "survey",
-  //     //   startTime: annotation.startTime,
-  //     //   endTime: annotation.startTime + 1,
-  //     //   selectTime: annotation.startTime,
-  //     //   ...result.data,
-  //     // };
-
-  //     const newAnnotation = {
-  //     type: "survey",
-  //     selectTime: annotation.startTime, // only use selectTime
-  //     ...questionPayload,
-  //   };
-
-  //     setAnnotations((prev) =>
-  //       [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
-  //     );
-
-  //     toast.success("Survey added successfully");
-  //   } else {
-  //     toast.error("Unknown annotation type");
-  //   }
-  // };
-
-  // const handleUpdateAnnotation = async (annotation) => {
-  //   console.log("annotation to be updated", annotation);
-
-  //   if (annotation.type === "product") {
-  //     const result = await updateCTA(annotation.id, annotation);
-
-  //     if (result.success) {
-  //       setAnnotations((prev) =>
-  //         prev.map((ann) =>
-  //           ann.id === annotation.id ? { ...ann, ...annotation } : ann
-  //         )
-  //       );
-  //       toast.success("CTA updated successfully");
-  //     } else {
-  //       console.log(result);
-  //       toast.error("CTA update failed");
-  //     }
-  //   } else if (annotation.type === "survey") {
-  //     // Build payload for feedback question
-  //     const questionPayload = {
-  //       question: annotation.question,
-  //       optionType: annotation.optionType,
-  //       options: annotation.options,
-  //       correctAnswers: annotation.correctAnswers,
-  //       selectTime: annotation.selectTime,
-  //     };
-
-  //     const result = await updateFeedBackQuestion(
-  //       annotation.id,
-  //       questionPayload
-  //     );
-
-  //     if (result.success) {
-  //       setAnnotations((prev) =>
-  //         prev.map((ann) =>
-  //           ann.id === annotation.id ? { ...ann, ...annotation } : ann
-  //         )
-  //       );
-  //       toast.success("Survey updated successfully");
-  //     } else {
-  //       console.log(result);
-  //       toast.error("Survey update failed");
-  //     }
-  //   } else {
-  //     toast.error("Unknown annotation type");
-  //   }
-  // };
-
   const handleAddAnnotation = async (annotation) => {
     // console.log("annotation to be added", annotation);
 
@@ -233,11 +97,11 @@ export default function VideoPage({ params }) {
       const result = await addFeedBackQuestion(params.id, questionPayload);
       // console.log("line 234", result)
       const newAnnotation = {
-       ...result,
-       type:'survey',
+        ...result,
+        type: "survey",
         startTime: annotation.startTime,
         selectTime: annotation.startTime,
-          endTime: annotation.startTime + 1,
+        endTime: annotation.startTime + 1,
       };
       setAnnotations(
         (prev) =>
@@ -296,29 +160,6 @@ export default function VideoPage({ params }) {
       toast.error("Unknown annotation type");
     }
   };
-
-  // const handleDeleteAnnotation = async (id, type) => {
-  //   let result;
-
-  //   if (type === "product") {
-  //     result = await deleteCTA(id);
-  //   } else if (type === "survey") {
-  //     result = await deleteFeedBackQuestion(id);
-  //   } else {
-  //     toast.error("Unknown annotation type");
-  //     return;
-  //   }
-
-  //   if (result.success) {
-  //     setAnnotations((prev) => prev.filter((ann) => ann.id !== id));
-  //     toast.success(
-  //       `${type === "product" ? "CTA" : "Survey"} deleted successfully`
-  //     );
-  //   } else {
-  //     toast.error(`Failed to delete ${type === "product" ? "CTA" : "Survey"}`);
-  //     console.log(result);
-  //   }
-  // };
 
   const handleDeleteAnnotation = async (id, type) => {
     let result;
@@ -431,30 +272,6 @@ export default function VideoPage({ params }) {
                   onDurationChange={setVideoDuration}
                 />
               </Card>
-
-              {/* Video Stats */}
-              {/* <Card className="p-6 bg-white">
-                <div className="grid grid-cols-3 gap-8 text-center">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Views</p>
-                    <p className="text-3xl font-bold text-gray-800">
-                      {video.views || 91}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Impressions</p>
-                    <p className="text-3xl font-bold text-gray-800">
-                      {video.impressions || 101}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Time Played</p>
-                    <p className="text-3xl font-bold text-gray-800">
-                      {video.timePlayed || "5 hr 10 sec"}
-                    </p>
-                  </div>
-                </div>
-              </Card> */}
             </div>
 
             {/* Sidebar */}
