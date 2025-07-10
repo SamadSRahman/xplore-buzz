@@ -156,16 +156,14 @@ export default function Home() {
               Start Creating
             </Button>
           </Link> */}
-          <Link href="/upload">
-            <Button
-              asChild
-              size="lg"
-              variant="secondary"
-              className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
-            >
-              <a>Start Creating</a>
-            </Button>
-          </Link>
+          <Button
+            asChild
+            size="lg"
+            variant="secondary"
+            className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+          >
+            <Link href="/upload">Start Creating</Link>
+          </Button>
         </motion.div>
       </motion.div>
     </div>
