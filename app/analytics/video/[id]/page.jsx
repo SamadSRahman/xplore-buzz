@@ -685,10 +685,19 @@ const AnalyticsPage = () => {
                       </div>
                     </div>
 
-                    <div className="p-2 bg-gray-50 rounded text-xs text-gray-600">
+                    {/* <div className="p-2 bg-gray-50 rounded text-xs text-gray-600">
                       <div>Last Interaction:</div>
                       <div className="font-medium">
                         {new Date(cta.lastInteraction).toLocaleString()}
+                      </div>
+                    </div> */}
+
+                    <div className="p-2 bg-gray-50 rounded text-xs text-gray-600">
+                      <div>Last Interaction:</div>
+                      <div className="font-medium">
+                        {cta.lastInteraction
+                          ? new Date(cta.lastInteraction).toLocaleString()
+                          : "No Interaction"}
                       </div>
                     </div>
 

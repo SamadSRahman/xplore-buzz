@@ -27,15 +27,7 @@ export default function VideoPage({ params }) {
     updateFeedBackQuestion,
   } = useFeedBackQuestion();
 
-  // useEffect(() => {
-  //   loadVideo();
-  // }, [params.id]);
-
   useEffect(() => {
-    if (!params?.id) {
-      console.log("Waiting for params.id...");
-      return;
-    }
     loadVideo();
   }, [params.id]);
 
@@ -45,7 +37,6 @@ export default function VideoPage({ params }) {
 
   const loadVideo = async () => {
     try {
-      if (!params?.id) return; // ✅ extra safety
       const videoData = await getVideoById(params.id);
       // console.log(videoData);
       setVideo(videoData.data);
