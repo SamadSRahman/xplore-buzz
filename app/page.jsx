@@ -156,16 +156,15 @@ export default function Home() {
               Start Creating
             </Button>
           </Link> */}
-          <Link href="/upload" passHref legacyBehavior>
-            <a>
-              <Button
-                size="lg"
-                variant="secondary"
-                className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
-              >
-                Start Creating
-              </Button>
-            </a>
+          <Link href="/upload">
+            <Button
+              asChild
+              size="lg"
+              variant="secondary"
+              className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+            >
+              <a>Start Creating</a>
+            </Button>
           </Link>
         </motion.div>
       </motion.div>
