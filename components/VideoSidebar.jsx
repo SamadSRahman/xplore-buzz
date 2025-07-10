@@ -98,6 +98,8 @@ export default function VideoSidebar({
       id: editingAnnotation?.id || uid(),
       type: "product",
       ...productForm,
+      startTime: Number(productForm.startTime),
+      endTime: Number(productForm.endTime),
       // Store the File object directly instead of converting to URL
       image: productForm.image || null,
     };

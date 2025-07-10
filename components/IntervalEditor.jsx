@@ -37,14 +37,6 @@ export default function IntervalEditor({
     }
   }, [selectedAnnotation]);
 
-  // const formatTime = (seconds) => {
-  //   console.log("format tim triggered with value", seconds);
-
-  //   const mins = Math.floor(seconds / 60);
-  //   const secs = Math.floor(seconds % 60);
-  //   return `${mins.toString().padStart(2, "0")}:
-  //     ${secs.toString().padStart(2, "0")}`;
-  // };
   const formatTime = (seconds) => {
     // console.log("format tim triggered with value", seconds);
 
@@ -59,7 +51,6 @@ export default function IntervalEditor({
   const getAnnotationWidth = ({ startTime, endTime }) =>
     ((endTime - startTime) / videoDuration) * 100;
   const typeColor = { product: "bg-blue-500", survey: "bg-purple-500" };
-  
 
   const handleFieldChange = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -202,54 +193,6 @@ export default function IntervalEditor({
               </motion.div>
             ))}
           </div>
-          {/* {selectedAnnotation && !editing && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-4 bg-gray-50 rounded-lg border"
-            >
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="font-semibold text-gray-900">Details</h4>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => handleEdit(selectedAnnotation, e)}
-                  className="text-purple-600 border-purple-200"
-                >
-                  <Edit className="w-4 h-4 mr-1" /> Edit
-                </Button>
-              </div>
-              
-              <div className="space-y-2">
-                {selectedAnnotation.type === "product" ? (
-                  <>
-                    <p><strong>Product:</strong> {selectedAnnotation.productName}</p>
-                    {selectedAnnotation.productUrl && (
-                      <p><strong>URL:</strong> {selectedAnnotation.productUrl}</p>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <p><strong>Question:</strong> {selectedAnnotation.question}</p>
-                    <p><strong>Type:</strong> {selectedAnnotation.type?.replace('-', ' ')}</p>
-                    {selectedAnnotation.options && selectedAnnotation.options.length > 0 && (
-                      <div>
-                        <strong>Options:</strong>
-                        <ul className="list-disc list-inside ml-2">
-                          {selectedAnnotation.options.map((opt, idx) => (
-                            <li key={idx} className="text-sm">{opt}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </>
-                )}
-                <p className="text-sm text-gray-500">
-                  {formatTime(selectedAnnotation.startTime)} - {formatTime(selectedAnnotation.endTime)}
-                </p>
-              </div>
-            </motion.div>
-          )} */}
         </div>
       </CardContent>
       {editing && editingType === "product" && (

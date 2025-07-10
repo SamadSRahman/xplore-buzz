@@ -412,7 +412,7 @@ useEffect(() => {
 
               <div className="flex items-center space-x-2">
                 {/* Reset Surveys Button (for testing) */}
-                <button
+                {/* <button
                   onClick={() => {
                     setDismissedSurveyIds(new Set());
                     setCompletedSurveyIds(new Set());
@@ -422,7 +422,7 @@ useEffect(() => {
                   title="Reset Surveys"
                 >
                   <RotateCcw className="w-4 h-4" />
-                </button>
+                </button> */}
 
                 {/* Settings */}
                 <button className="p-2 hover:bg-white/20 rounded-full transition-colors">
