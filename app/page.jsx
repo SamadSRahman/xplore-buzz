@@ -1,10 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Play, Upload, Users, BarChart3, Zap, Shield } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { motion } from "framer-motion";
+import { Play, Upload, Users, BarChart3, Zap, Shield } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -24,39 +30,39 @@ const itemVariants = {
 const features = [
   {
     icon: Upload,
-    title: 'Easy Upload',
-    description: 'Drag and drop HLS video files with seamless processing',
-    color: 'text-emerald-600',
+    title: "Easy Upload",
+    description: "Drag and drop HLS video files with seamless processing",
+    color: "text-emerald-600",
   },
   {
     icon: Play,
-    title: 'Smart Player',
-    description: 'Advanced video player with time-based annotations',
-    color: 'text-blue-600',
+    title: "Smart Player",
+    description: "Advanced video player with time-based annotations",
+    color: "text-blue-600",
   },
   {
     icon: Users,
-    title: 'Interactive Surveys',
-    description: 'Engage viewers with contextual surveys and feedback forms',
-    color: 'text-purple-600',
+    title: "Interactive Surveys",
+    description: "Engage viewers with contextual surveys and feedback forms",
+    color: "text-purple-600",
   },
   {
     icon: BarChart3,
-    title: 'Analytics',
-    description: 'Track engagement, views, and interaction metrics',
-    color: 'text-orange-600',
+    title: "Analytics",
+    description: "Track engagement, views, and interaction metrics",
+    color: "text-orange-600",
   },
   {
     icon: Zap,
-    title: 'Real-time',
-    description: 'Instant updates and live collaboration features',
-    color: 'text-yellow-600',
+    title: "Real-time",
+    description: "Instant updates and live collaboration features",
+    color: "text-yellow-600",
   },
   {
     icon: Shield,
-    title: 'Secure',
-    description: 'Enterprise-grade security for your video content',
-    color: 'text-red-600',
+    title: "Secure",
+    description: "Enterprise-grade security for your video content",
+    color: "text-red-600",
   },
 ];
 
@@ -75,17 +81,25 @@ export default function Home() {
             Welcome to BUZZ
           </h1>
           <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto">
-            The ultimate video annotation and survey platform. Create interactive experiences 
-            that engage your audience and drive meaningful insights.
+            The ultimate video annotation and survey platform. Create
+            interactive experiences that engage your audience and drive
+            meaningful insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link href="/upload">
-              <Button size="lg" className="bg-purple-gradient hover:opacity-90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg">
+              <Button
+                size="lg"
+                className="bg-purple-gradient hover:opacity-90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
+              >
                 Get Started
               </Button>
             </Link>
             <Link href="/login">
-              <Button variant="outline" size="lg" className="px-8 py-3 rounded-xl font-semibold">
+              <Button
+                variant="outline"
+                size="lg"
+                className="px-8 py-3 rounded-xl font-semibold"
+              >
                 Sign In
               </Button>
             </Link>
@@ -93,7 +107,10 @@ export default function Home() {
         </motion.div>
 
         {/* Features Grid */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16"
+        >
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -103,10 +120,14 @@ export default function Home() {
             >
               <Card className="h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
                 <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4`}>
+                  <div
+                    className={`w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4`}
+                  >
                     <feature.icon className={`w-6 h-6 ${feature.color}`} />
                   </div>
-                  <CardTitle className="text-xl font-bold">{feature.title}</CardTitle>
+                  <CardTitle className="text-xl font-bold">
+                    {feature.title}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CardDescription className="text-gray-600">
@@ -119,15 +140,32 @@ export default function Home() {
         </motion.div>
 
         {/* CTA Section */}
-        <motion.div variants={itemVariants} className="mt-20 p-8 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-          <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Videos?</h2>
+        <motion.div
+          variants={itemVariants}
+          className="mt-20 p-8 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-500 text-white"
+        >
+          <h2 className="text-3xl font-bold mb-4">
+            Ready to Transform Your Videos?
+          </h2>
           <p className="text-lg mb-6 opacity-90">
-            Join thousands of creators who are already using BUZZ to create engaging video experiences.
+            Join thousands of creators who are already using BUZZ to create
+            engaging video experiences.
           </p>
-          <Link href="/upload">
+          {/* <Link href="/upload">
             <Button size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold">
               Start Creating
             </Button>
+          </Link> */}
+          <Link href="/upload" passHref legacyBehavior>
+            <a>
+              <Button
+                size="lg"
+                variant="secondary"
+                className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+              >
+                Start Creating
+              </Button>
+            </a>
           </Link>
         </motion.div>
       </motion.div>
