@@ -67,6 +67,7 @@ const features = [
 ];
 
 export default function Home() {
+  const MotionButton = motion(Button);
   return (
     <div className="container mx-auto px-4 py-12">
       <motion.div
@@ -156,14 +157,16 @@ export default function Home() {
               Start Creating
             </Button>
           </Link> */}
-          <Button
+          <MotionButton
             asChild
             size="lg"
             variant="secondary"
             className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Link href="/upload">Start Creating</Link>
-          </Button>
+          </MotionButton>
         </motion.div>
       </motion.div>
     </div>
