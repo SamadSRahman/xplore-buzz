@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Play, Upload, Users, BarChart3, Zap, Shield } from "lucide-react";
 import Link from "next/link";
@@ -67,7 +68,7 @@ const features = [
 ];
 
 export default function Home() {
-  const MotionButton = motion(Button);
+  const router = useRouter();
   return (
     <div className="container mx-auto px-4 py-12">
       <motion.div
