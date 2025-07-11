@@ -208,14 +208,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Menu, X, User, LogOut, Upload, Home } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/src/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import useAuth from '@/hooks/useAuth';
+} from '@/src/components/ui/dropdown-menu';
+import useAuth from '@/src/hooks/useAuth';
 
 const BuzzLogo = () => (
   <div className="flex items-center space-x-2">

@@ -115,8 +115,8 @@
 import { motion } from 'framer-motion';
 import { ShoppingCart, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/src/components/ui/button';
+import { Card, CardContent } from '@/src/components/ui/card';
 
 export default function ProductPopup({ annotation, onClose }) {
   const [imageSrc, setImageSrc] = useState(null);

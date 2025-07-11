@@ -3,12 +3,12 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
-import  Spinner  from '@/components/ui/spinner';
+import { Button } from '@/src/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/src/components/ui/card';
+import  Spinner  from '@/src/components/ui/spinner';
 import { formatDistanceToNow, format } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import useVideo from '@/hooks/useVideo'
+import useVideo from "@/src/hooks/useVideo"
 
 export default function VideoListPage() {
  

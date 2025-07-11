@@ -11,9 +11,9 @@ import {
   Save,
   X as Close,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Badge } from "@/src/components/ui/badge";
 
 import EditProductPopup from "./popups/EditCTAPopup";
 import EditSurveyPopup from "./popups/EditSurveyPopup";
