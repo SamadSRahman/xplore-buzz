@@ -161,9 +161,10 @@ export default function Home() {
               Start Creating
             </Button>
           </Link>
-          <Link href="/upload">Go to Upload</Link>
-          <Link href="/upload" passHref>
-            <Button>Start Creating</Button>
+          <Link href="/upload">
+            <Button onClick={() => router.push("/upload")}>
+              Start Creating
+            </Button>
           </Link>
         </motion.div>
       </motion.div>
