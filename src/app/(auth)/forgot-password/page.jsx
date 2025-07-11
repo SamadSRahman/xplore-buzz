@@ -1,15 +1,15 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Mail } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { Mail } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { toast } from "sonner";
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [apiClient, setApiClient] = useState(null);
   const router = useRouter();
@@ -17,10 +17,10 @@ export default function ForgotPasswordPage() {
   // Dynamically import and setup API client on mount
   useEffect(() => {
     const setupApiClient = async () => {
-      const { apiClient: client } = await import('@/lib/axios');
+      const { apiClient: client } = await import("@/src/lib/axios");
       setApiClient(client);
     };
-    
+
     setupApiClient();
   }, []);
 
@@ -28,38 +28,36 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
 
     if (!apiClient) {
-      toast.error('API client not ready');
+      toast.error("API client not ready");
       return;
     }
 
     if (!email) {
-      toast.error('Please enter your email');
+      toast.error("Please enter your email");
       return;
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address');
+      toast.error("Please enter a valid email address");
       return;
     }
 
     setLoading(true);
     try {
-      const response = await apiClient.post('/accounts/forgot-password', {
+      const response = await apiClient.post("/accounts/forgot-password", {
         email,
       });
 
       if (response.data.success) {
-        toast.success('Reset link sent to your email');
-        router.push('/login');
+        toast.success("Reset link sent to your email");
+        router.push("/login");
       } else {
-        toast.error(response.data.error || 'Failed to send reset link');
+        toast.error(response.data.error || "Failed to send reset link");
       }
     } catch (error) {
       console.error(error);
-      toast.error(
-        error.response?.data?.error || 'Error sending reset link'
-      );
+      toast.error(error.response?.data?.error || "Error sending reset link");
     } finally {
       setLoading(false);
     }
@@ -100,13 +98,13 @@ export default function ForgotPasswordPage() {
               className="w-full bg-purple-gradient text-white"
               disabled={loading || !apiClient}
             >
-              {loading ? 'Sending...' : 'Send Reset Link'}
+              {loading ? "Sending..." : "Send Reset Link"}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Remember your password?{' '}
+              Remember your password?{" "}
               <Link
                 href="/login"
                 className="text-purple-600 hover:text-purple-700 font-semibold"

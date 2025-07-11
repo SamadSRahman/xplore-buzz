@@ -4,14 +4,14 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Play, Upload, Users, BarChart3, Zap, Shield } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/src/components/ui/card";
 
 const containerVariants = {
   hidden: { opacity: 0 },

@@ -6,11 +6,11 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   Lock, ArrowLeft, CheckCircle, XCircle, Eye, EyeOff,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/src/components/ui/button';
+import { Input } from '@/src/components/ui/input';
+import { Label } from '@/src/components/ui/label';
 import { toast } from 'sonner';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/src/hooks/useAuth';
 
 export default function ResetPasswordPage() {
   const { token } = useParams();

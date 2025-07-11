@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, XCircle, RefreshCw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import useAuth from '@/hooks/useAuth';
+import { Button } from '@/src/components/ui/button';
+import useAuth from '@/src/hooks/useAuth';
 import { toast } from 'sonner';
 
 export default function VerifyEmailPage() {

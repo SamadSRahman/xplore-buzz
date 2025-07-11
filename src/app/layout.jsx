@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { Toaster } from 'sonner';
-import Navbar from '@/components/Navbar';
+import Navbar from '@/src/components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 

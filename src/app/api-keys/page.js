@@ -8,11 +8,11 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useToast } from "@/hooks/use-toast";
+} from "@/src/components/ui/card";
+import { Button } from "@/src/components/ui/button";
+import { Input } from "@/src/components/ui/input";
+import { Label } from "@/src/components/ui/label";
+import { useToast } from "@/src/hooks/use-toast";
 import {
   Copy,
   Key,
@@ -33,11 +33,11 @@ import {
   Zap,
   Thermometer,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useSecretKey from "@/hooks/useSecretKey";
-import useProvidersKey from "@/hooks/useProvidersKey";
+import { Badge } from "@/src/components/ui/badge";
+import { Separator } from "@/src/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/src/components/ui/tabs";
+import useSecretKey from "@/src/hooks/useSecretKey";
+import useProvidersKey from "@/src/hooks/useProvidersKey";
 
 export default function ApiKeysPage() {
   const { toast } = useToast();

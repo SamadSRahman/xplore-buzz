@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import VideoPlayer from "@/components/VideoPlayer";
-import IntervalEditor from "@/components/IntervalEditor";
-import VideoSidebar from "@/components/VideoSidebar";
-import { Card } from "@/components/ui/card";
-import useVideo from "@/hooks/useVideo";
-import useCTA from "@/hooks/useCTA";
-import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
+import VideoPlayer from "@/src/components/VideoPlayer";
+import IntervalEditor from "@/src/components/IntervalEditor";
+import VideoSidebar from "@/src/components/VideoSidebar";
+import { Card } from "@/src/components/ui/card";
+import useVideo from "@/src/hooks/useVideo";
+import useCTA from "@/src/hooks/useCTA";
+import { useFeedBackQuestion } from "@/src/hooks/useFeedBackQuestion";
 
 export default function VideoPage({ params }) {
   const [video, setVideo] = useState(null);

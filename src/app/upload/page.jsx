@@ -3,14 +3,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Upload, X, CheckCircle, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
+import { Button } from "@/src/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { Input } from "@/src/components/ui/input";
+import { Textarea } from "@/src/components/ui/textarea";
+import { Progress } from "@/src/components/ui/progress";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import useVideo from "../../src/hooks/useVideo";
+import useVideo from "../../hooks/useVideo.js";
 
 export default function UploadPage() {
   const [fileObj, setFileObj] = useState(null);
