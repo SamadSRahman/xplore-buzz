@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/card";
 import useVideo from "@/hooks/useVideo";
 import useCTA from "@/hooks/useCTA";
 import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
+import QRPopup from "@/components/QRPopup"; // adjust path if needed
 
 export default function VideoPage({ params }) {
   const [video, setVideo] = useState(null);
@@ -18,6 +19,7 @@ export default function VideoPage({ params }) {
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [isQRPopupOpen, setIsQRPopupOpen] = useState(false);
 
   const { getVideoById } = useVideo();
   const { addCTA, deleteCTA, updateCTA } = useCTA();
@@ -233,11 +235,11 @@ export default function VideoPage({ params }) {
       const result = await addFeedBackQuestion(params.id, questionPayload);
       // console.log("line 234", result)
       const newAnnotation = {
-       ...result,
-       type:'survey',
+        ...result,
+        type: "survey",
         startTime: annotation.startTime,
         selectTime: annotation.startTime,
-          endTime: annotation.startTime + 1,
+        endTime: annotation.startTime + 1,
       };
       setAnnotations(
         (prev) =>
@@ -411,7 +413,10 @@ export default function VideoPage({ params }) {
               <button className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
                 Save video
               </button>
-              <button className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
+              <button
+                onClick={() => setIsQRPopupOpen(true)}
+                className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+              >
                 Share video
               </button>
             </div>
@@ -484,6 +489,15 @@ export default function VideoPage({ params }) {
           />
         </motion.div>
       </div>
+      <QRPopup
+        isOpen={isQRPopupOpen}
+        onClose={() => setIsQRPopupOpen(false)}
+        qrCodeUrl={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+          window?.location?.href
+        )}`}
+        previewUrl={window?.location?.href}
+        linkToCopy={window?.location?.href}
+      />
     </div>
   );
 }
