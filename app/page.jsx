@@ -152,21 +152,19 @@ export default function Home() {
             Join thousands of creators who are already using BUZZ to create
             engaging video experiences.
           </p>
-          {/* <Link href="/upload">
-            <Button size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold">
+          <Link href="/upload">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+            >
               Start Creating
             </Button>
-          </Link> */}
-          <MotionButton
-            asChild
-            size="lg"
-            variant="secondary"
-            className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <Link href="/upload">Start Creating</Link>
-          </MotionButton>
+          </Link>
+          <Link href="/upload">Go to Upload</Link>
+          <Link href="/upload" passHref>
+            <Button>Start Creating</Button>
+          </Link>
         </motion.div>
       </motion.div>
     </div>
