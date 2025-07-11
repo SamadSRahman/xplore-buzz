@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 import { useParams } from "next/navigation";
-import useAnalytics from "../../../../hooks/useAnalytics.js";
+import useAnalytics from "../../../../src/hooks/useAnalytics.js";
 
 const AnalyticsPage = () => {
   // const { analyticsData, loading, getVideoAnalyticsSummary } = useAnalytics();

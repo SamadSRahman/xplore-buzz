@@ -10,9 +10,12 @@ export default function useAnalytics() {
   const getVideoAnalyticsSummary = async (videoId, timeRange = "30d") => {
     setLoading(true);
     try {
-      const response = await apiClientWithAuth.get(`/analytics/video/${videoId}/summary`, {
-        params: { timeRange }
-      });
+      const response = await apiClientWithAuth.get(
+        `/analytics/video/${videoId}/summary`,
+        {
+          params: { timeRange },
+        }
+      );
       console.log("Analytics summary response:", response.data);
       setAnalyticsData(response.data);
       return response.data;
@@ -20,7 +23,9 @@ export default function useAnalytics() {
       console.error("Error fetching analytics summary:", error);
       if (error.response) {
         console.error("API Response Error:", error.response.data);
-        throw new Error(error.response.data.message || "Failed to fetch analytics summary");
+        throw new Error(
+          error.response.data.message || "Failed to fetch analytics summary"
+        );
       }
       throw new Error("Unexpected error fetching analytics summary");
     } finally {
@@ -31,6 +36,6 @@ export default function useAnalytics() {
   return {
     analyticsData,
     loading,
-    getVideoAnalyticsSummary
+    getVideoAnalyticsSummary,
   };
 }

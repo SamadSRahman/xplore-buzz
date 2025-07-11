@@ -1,6 +1,6 @@
 "use client";
 
-import  { useState } from "react";
+import { useState } from "react";
 import { apiClient } from "../lib/axios";
 import axios from "axios";
 
@@ -79,14 +79,12 @@ export default function useAuth() {
     }
   };
   const resetPassword = async (token, password, confirmPassword) => {
-    console.log("parmas", token
-      , password, confirmPassword
-    );
-    
+    console.log("parmas", token, password, confirmPassword);
+
     try {
       const response = await apiClient.patch(
         `/accounts/reset-password/${token}`,
-        { password,confirm_password: confirmPassword }
+        { password, confirm_password: confirmPassword }
       );
       console.log("response", response.data);
       return response.data;
@@ -97,7 +95,7 @@ export default function useAuth() {
   };
   const logout = async () => {
     let token = "";
-    if(window !== undefined){
+    if (window !== undefined) {
       localStorage.getItem("token");
     }
     // api client not used due to token issue
@@ -111,11 +109,10 @@ export default function useAuth() {
           },
         }
       );
-      window.location.href = "/login"
-      localStorage.removeItem("token")
-      localStorage.removeItem("user")
+      window.location.href = "/login";
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       return response.data;
-      
     } catch (error) {
       console.error(error.response.data.error);
       return error.response.data;

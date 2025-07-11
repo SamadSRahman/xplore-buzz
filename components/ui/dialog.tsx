@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { X } from 'lucide-react';
+import * as React from "react";
+import * as DialogPrimitive from "@radix-ui/react-dialog";
+import { X } from "lucide-react";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/src/lib/utils";
 
 const Dialog = DialogPrimitive.Root;
 
@@ -71,23 +71,25 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className={cn(
-        // Positioning
-        "absolute right-4 top-4 z-10",
-        // Enhanced button design
-        "flex h-8 w-8 items-center justify-center",
-        "rounded-full bg-gray-100/80 dark:bg-gray-800/80",
-        "border border-gray-200/50 dark:border-gray-700/50",
-        // Hover and focus states
-        "transition-all duration-200 ease-out",
-        "hover:bg-gray-200/80 dark:hover:bg-gray-700/80",
-        "hover:scale-105 hover:shadow-lg",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-        // Active state
-        "active:scale-95",
-        // Text color
-        "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
-      )}>
+      <DialogPrimitive.Close
+        className={cn(
+          // Positioning
+          "absolute right-4 top-4 z-10",
+          // Enhanced button design
+          "flex h-8 w-8 items-center justify-center",
+          "rounded-full bg-gray-100/80 dark:bg-gray-800/80",
+          "border border-gray-200/50 dark:border-gray-700/50",
+          // Hover and focus states
+          "transition-all duration-200 ease-out",
+          "hover:bg-gray-200/80 dark:hover:bg-gray-700/80",
+          "hover:scale-105 hover:shadow-lg",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+          // Active state
+          "active:scale-95",
+          // Text color
+          "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+        )}
+      >
         <X className="h-4 w-4" />
         {/* <span className="sr-only">Close</span> */}
       </DialogPrimitive.Close>
@@ -116,7 +118,7 @@ const DialogHeader = ({
     {...props}
   />
 );
-DialogHeader.displayName = 'DialogHeader';
+DialogHeader.displayName = "DialogHeader";
 
 const DialogFooter = ({
   className,
@@ -138,7 +140,7 @@ const DialogFooter = ({
     {...props}
   />
 );
-DialogFooter.displayName = 'DialogFooter';
+DialogFooter.displayName = "DialogFooter";
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
