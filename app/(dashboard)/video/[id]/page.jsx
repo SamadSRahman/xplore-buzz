@@ -7,7 +7,7 @@ import VideoPlayer from "@/components/VideoPlayer";
 import IntervalEditor from "@/components/IntervalEditor";
 import VideoSidebar from "@/components/VideoSidebar";
 import { Card } from "@/components/ui/card";
-import useVideo from "@/hooks/useVideo";
+import useVideo from "../../../../hooks/useVideo.js";
 import useCTA from "@/hooks/useCTA";
 import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
 import QRPopup from "@/components/QRPopup"; // adjust path if needed

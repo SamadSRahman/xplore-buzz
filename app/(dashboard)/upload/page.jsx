@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
-import useVideo from '../../hooks/useVideo';
+import useVideo from '../../../hooks/useVideo.js';
 
 export default function UploadPage() {
   const [fileObj, setFileObj] = useState(null);
