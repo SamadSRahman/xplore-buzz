@@ -1,5 +1,5 @@
-import { apiClientWithAuth } from "@/lib/axios";
-import { formatTime } from "@/lib/utils";
+import { apiClientWithAuth } from "@/src/lib/axios";
+import { formatTime } from "@/src/lib/utils";
 
 export default function useCTA() {
   const addCTA = async (cta, id) => {

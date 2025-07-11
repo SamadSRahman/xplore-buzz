@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { getSession, signOut as apiSignOut } from '@/lib/api/auth';
+import { getSession, signOut as apiSignOut } from '@/src/lib/api/auth';
 
 const AuthContext = createContext({});
 
