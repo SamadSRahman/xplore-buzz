@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { Toaster } from 'sonner';
 import Navbar from '@/components/Navbar';
+import { useEffect, useState } from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,6 +24,32 @@ const pageTransition = {
 
 export default function RootLayout({ children }) {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure component is mounted before rendering to prevent hydration issues
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <html lang="en">
+        <head>
+          <title>BUZZ - Video Annotation & Survey Tool</title>
+          <meta name="description" content="Professional video annotation and survey platform" />
+        </head>
+        <body className={inter.className}>
+          <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+            <Navbar />
+            <main className="pt-16">
+              {children}
+            </main>
+            <Toaster richColors position="top-right" />
+          </div>
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang="en">
@@ -31,24 +58,23 @@ export default function RootLayout({ children }) {
         <meta name="description" content="Professional video annotation and survey platform" />
       </head>
       <body className={inter.className}>
-       
-          <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-            <Navbar />
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.main
-                key={pathname}
-                initial="initial"
-                animate="in"
-                exit="out"
-                variants={pageVariants}
-                transition={pageTransition}
-                className="pt-16"
-              >
-                {children}
-              </motion.main>
-            </AnimatePresence>
-            <Toaster richColors position="top-right" />
-          </div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+          <Navbar />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.main
+              key={pathname}
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+              className="pt-16"
+            >
+              {children}
+            </motion.main>
+          </AnimatePresence>
+          <Toaster richColors position="top-right" />
+        </div>
       </body>
     </html>
   );

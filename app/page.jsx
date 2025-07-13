@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Play, Upload, Users, BarChart3, Zap, Shield } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -61,6 +62,12 @@ const features = [
 ];
 
 export default function Home() {
+  const router = useRouter();
+
+  const handleNavigation = (path) => {
+    router.push(path);
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <motion.div
@@ -79,16 +86,21 @@ export default function Home() {
             that engage your audience and drive meaningful insights.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/upload">
-              <Button size="lg" className="bg-purple-gradient hover:opacity-90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg">
-                Get Started
-              </Button>
-            </Link>
-            <Link href="/login">
-              <Button variant="outline" size="lg" className="px-8 py-3 rounded-xl font-semibold">
-                Sign In
-              </Button>
-            </Link>
+            <Button 
+              size="lg" 
+              className="bg-purple-gradient hover:opacity-90 text-white px-8 py-3 rounded-xl font-semibold shadow-lg"
+              onClick={() => handleNavigation('/upload')}
+            >
+              Get Started
+            </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="px-8 py-3 rounded-xl font-semibold"
+              onClick={() => handleNavigation('/login')}
+            >
+              Sign In
+            </Button>
           </div>
         </motion.div>
 
@@ -124,11 +136,14 @@ export default function Home() {
           <p className="text-lg mb-6 opacity-90">
             Join thousands of creators who are already using BUZZ to create engaging video experiences.
           </p>
-          <Link href="/upload">
-            <Button size="lg" variant="secondary" className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold">
-              Start Creating
-            </Button>
-          </Link>
+          <Button 
+            size="lg" 
+            variant="secondary" 
+            className="bg-white text-purple-600 hover:bg-gray-100 px-8 py-3 rounded-xl font-semibold"
+            onClick={() => handleNavigation('/upload')}
+          >
+            Start Creating
+          </Button>
         </motion.div>
       </motion.div>
     </div>
