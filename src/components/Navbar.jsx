@@ -38,16 +38,6 @@ export default function Navbar() {
     setUser(storedUser ? JSON.parse(storedUser) : null);
   }, []);
 
-  const navigation = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Upload", href: "/upload", icon: Upload, requireAuth: true },
-    { name: "Videos", href: "/videos", icon: Upload, requireAuth: true },
-    { name: "Profile", href: "/profile", icon: User, requireAuth: true },
-    { name: "API Keys", href: "/api-keys", icon: User, requireAuth: true },
-  ];
-
-  const isActive = (href) => location.pathname === href;
-
   const handleNavigation = (href) => {
     setIsOpen(false);
     navigate(href);
@@ -76,76 +66,7 @@ export default function Navbar() {
             <BuzzLogo />
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => {
-              if (item.requireAuth && !user) return null;
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => handleNavigation(item.href)}
-                  className={`relative px-3 py-2 rounded-lg transition-colors ${
-                    isActive(item.href)
-                      ? "text-purple-600 bg-purple-50"
-                      : "text-gray-600 hover:text-purple-600 hover:bg-gray-50"
-                  }`}
-                >
-                  <span className="flex items-center space-x-1">
-                    <item.icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </span>
-                  {isActive(item.href) && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="absolute inset-0 bg-purple-100 rounded-lg -z-10"
-                      transition={{ type: "spring", duration: 0.5 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Auth Section */}
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center space-x-2"
-                  >
-                    <User className="w-4 h-4" />
-                    <span>{user?.email || "User"}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleNavigation("/profile")}>
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="ghost" 
-                  onClick={() => handleNavigation("/login")}
-                >
-                  Sign In
-                </Button>
-                <Button 
-                  className="bg-purple-gradient text-white"
-                  onClick={() => handleNavigation("/register")}
-                >
-                  Sign Up
-                </Button>
-              </div>
-            )}
-          </div>
+          
 
           {/* Mobile Menu Button */}
           <button
@@ -156,74 +77,7 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden py-4 border-t"
-          >
-            <div className="space-y-2">
-              {navigation.map((item) => {
-                if (item.requireAuth && !user) return null;
-                return (
-                  <button
-                    key={item.name}
-                    onClick={() => handleNavigation(item.href)}
-                    className={`block w-full text-left px-3 py-2 rounded-lg transition-colors ${
-                      isActive(item.href)
-                        ? "text-purple-600 bg-purple-50"
-                        : "text-gray-600 hover:text-purple-600 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span className="flex items-center space-x-2">
-                      <item.icon className="w-4 h-4" />
-                      <span>{item.name}</span>
-                    </span>
-                  </button>
-                );
-              })}
-              {user ? (
-                <>
-                  <button
-                    onClick={() => handleNavigation("/profile")}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-gray-600 hover:text-purple-600 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center space-x-2">
-                      <User className="w-4 h-4" />
-                      <span>Profile</span>
-                    </span>
-                  </button>
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-gray-600 hover:text-purple-600 hover:bg-gray-50"
-                  >
-                    <span className="flex items-center space-x-2">
-                      <LogOut className="w-4 h-4" />
-                      <span>Sign Out</span>
-                    </span>
-                  </button>
-                </>
-              ) : (
-                <div className="space-y-2 pt-2 border-t">
-                  <button
-                    onClick={() => handleNavigation("/login")}
-                    className="block w-full text-left px-3 py-2 rounded-lg text-gray-600 hover:text-purple-600 hover:bg-gray-50"
-                  >
-                    Sign In
-                  </button>
-                  <button
-                    onClick={() => handleNavigation("/register")}
-                    className="block w-full text-left px-3 py-2 rounded-lg bg-purple-gradient text-white text-center"
-                  >
-                    Sign Up
-                  </button>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
+        
       </div>
     </motion.nav>
   );

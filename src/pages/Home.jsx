@@ -1,8 +1,6 @@
 import { motion } from 'framer-motion';
 import { Play, Upload, Users, BarChart3, Zap, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -58,6 +56,57 @@ const features = [
   },
 ];
 
+// Simple Button component (if you don't have shadcn/ui)
+const Button = ({ children, onClick, variant = 'default', size = 'md', className = '' }) => {
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+  
+  const sizeClasses = {
+    sm: 'px-3 py-1.5 text-sm',
+    md: 'px-4 py-2 text-sm',
+    lg: 'px-6 py-3 text-base',
+  };
+
+  const variantClasses = {
+    default: 'bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-500',
+    outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-gray-500',
+    secondary: 'bg-gray-100 text-gray-900 hover:bg-gray-200 focus:ring-gray-500',
+  };
+
+  return (
+    <button
+      onClick={onClick}
+      className={`${baseClasses} ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+    >
+      {children}
+    </button>
+  );
+};
+
+// Simple Card components (if you don't have shadcn/ui)
+const Card = ({ children, className = '' }) => (
+  <div className={`bg-white shadow-sm border border-gray-200 rounded-lg ${className}`}>
+    {children}
+  </div>
+);
+
+const CardHeader = ({ children }) => (
+  <div className="p-6 pb-4">{children}</div>
+);
+
+const CardTitle = ({ children, className = '' }) => (
+  <h3 className={`text-lg font-semibold leading-none tracking-tight ${className}`}>
+    {children}
+  </h3>
+);
+
+const CardContent = ({ children }) => (
+  <div className="p-6 pt-0">{children}</div>
+);
+
+const CardDescription = ({ children, className = '' }) => (
+  <p className={`text-sm text-gray-600 ${className}`}>{children}</p>
+);
+
 export default function Home() {
   const navigate = useNavigate();
 
@@ -108,7 +157,7 @@ export default function Home() {
             >
               <Card className="h-full hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
                 <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4`}>
+                  <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center mb-4">
                     <feature.icon className={`w-6 h-6 ${feature.color}`} />
                   </div>
                   <CardTitle className="text-xl font-bold">{feature.title}</CardTitle>

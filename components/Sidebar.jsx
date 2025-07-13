@@ -65,7 +65,7 @@ const Sidebar = () => {
       `}
     >
       {/* Header */}
-      <div
+      {/* <div
         className={`p-3 border-b border-gray-100 flex items-center ${
           isCollapsed ? "justify-center" : "justify-end"
         }`}
@@ -80,7 +80,7 @@ const Sidebar = () => {
             <ChevronLeft size={20} className="text-gray-600" />
           )}
         </button>
-      </div>
+      </div> */}
 
       {/* Menu Items */}
       <nav className="flex-1 p-6 space-y-3">
