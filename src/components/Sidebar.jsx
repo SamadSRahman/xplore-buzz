@@ -80,7 +80,7 @@ export default function Sidebar() {
     <motion.div
       layout
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`relative bg-white border-r border-gray-200 flex flex-col z-40 h-screen ${
+      className={`fixed bg-white border-r border-gray-200 flex flex-col z-40 h-screen ${
         isCollapsed ? "w-20" : "w-64"
       }`}
     >

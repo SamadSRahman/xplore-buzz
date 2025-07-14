@@ -40,7 +40,7 @@ function App() {
       <Navbar />
       <div className="flex">
         {showSidebar && <Sidebar />}
-        <main className="flex-grow pt-16">
+        <main className="flex-grow pt-16 pl-60">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
