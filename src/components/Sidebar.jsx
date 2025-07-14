@@ -22,11 +22,11 @@ const navItems = [
 const UserAvatar = ({ user, isCollapsed }) => {
   const getInitials = (name) => {
     if (!name) return "U";
-    const names = name.split(" ");
-    return names
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase();
+    const names = name.trim().split(/\s+/);
+    if (names.length >= 3) {
+      return (names[0][0] + names[names.length - 1][0]).toUpperCase();
+    }
+    return names.map((n) => n[0]).join("").toUpperCase();
   };
 
   return (
@@ -65,6 +65,7 @@ export default function Sidebar() {
   }, []);
 
   const handleLogout = async () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
     try {
       await logout();
       setUser(null);

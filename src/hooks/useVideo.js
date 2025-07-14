@@ -23,7 +23,8 @@ export default function useVideo() {
       return response.data;
     } catch (error) {
       console.error("Error uploading video:", error);
-      throw new Error("Video upload failed");
+      return error.response.data
+      // throw new Error("Video upload failed");
     }
   };
 
