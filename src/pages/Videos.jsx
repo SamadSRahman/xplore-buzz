@@ -9,6 +9,7 @@ import {
   AlertCircle,
   Trash2,
   Share2,
+  BarChart2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,11 +23,14 @@ import Spinner from "@/components/ui/spinner";
 import { formatDistanceToNow, format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import useVideo from "@/hooks/useVideo";
+import QRPopup from "@/components/QRPopup";
 
 export default function VideoListPage() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const { getAllVideos, allVideos, deleteVideo  } = useVideo();
+  const { getAllVideos, allVideos, deleteVideo } = useVideo();
+  const [isQRPopupOpen, setIsQRPopupOpen] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState(null);
 
   useEffect(() => {
     async function load() {
@@ -49,16 +53,15 @@ export default function VideoListPage() {
     return `${mins}:${secs}`;
   };
   const handleDelete = async (id) => {
-  if (confirm("Are you sure you want to delete this video?")) {
-    try {
-      await deleteVideo(id);
-    } catch (err) {
-      console.error("Failed to delete video:", err);
-      alert("Video deletion failed.");
+    if (confirm("Are you sure you want to delete this video?")) {
+      try {
+        await deleteVideo(id);
+      } catch (err) {
+        console.error("Failed to delete video:", err);
+        alert("Video deletion failed.");
+      }
     }
-  }
-};
-
+  };
 
   if (loading) {
     return (
@@ -146,10 +149,21 @@ export default function VideoListPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => console.log("Share", video.id)}
+                      onClick={() => {
+                        setSelectedVideoId(video.id);
+                        setIsQRPopupOpen(true);
+                      }}
                     >
                       <Share2 className="w-4 h-4 text-blue-500" />
                     </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => navigate(`/analytics/video/${video.id}`)}
+                    >
+                      <BarChart2 className="w-4 h-4 text-purple-500" />
+                    </Button>
+
                     <Button
                       variant="ghost"
                       size="icon"
@@ -171,6 +185,27 @@ export default function VideoListPage() {
           </motion.div>
         ))}
       </div>
+      <QRPopup
+        isOpen={isQRPopupOpen}
+        onClose={() => setIsQRPopupOpen(false)}
+        qrCodeUrl={
+          selectedVideoId
+            ? `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
+                `https://xplore-buzz-video-preview.vercel.app/video/${selectedVideoId}`
+              )}`
+            : ""
+        }
+        previewUrl={
+          selectedVideoId
+            ? `https://xplore-buzz-video-preview.vercel.app/video/${selectedVideoId}`
+            : ""
+        }
+        linkToCopy={
+          selectedVideoId
+            ? `https://xplore-buzz-video-preview.vercel.app/video/${selectedVideoId}`
+            : ""
+        }
+      />
     </div>
   );
 }

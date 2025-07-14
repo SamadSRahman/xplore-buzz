@@ -35,7 +35,7 @@ export default function LoginPage() {
       const result = await login({ email, password });
       if (result.success) {
         toast.success("Welcome back!");
-        navigate("/");
+        navigate("/videos");
       }
     } catch (error) {
       toast.error(error.message || "Login failed");

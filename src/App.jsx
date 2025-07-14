@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, matchPath } from "react-router-dom";
 import { Toaster } from "sonner";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
@@ -20,7 +20,20 @@ import Analytics from "./pages/Analytics";
 
 function App() {
   const location = useLocation();
-  const showSidebar = location.pathname !== "/";
+  // const showSidebar = location.pathname !== "/";
+
+  const sidebarHiddenRoutes = [
+    "/",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password/:token",
+    "/verify-email/:token",
+  ];
+
+  const showSidebar = !sidebarHiddenRoutes.some((path) =>
+    matchPath({ path, end: true }, location.pathname)
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">

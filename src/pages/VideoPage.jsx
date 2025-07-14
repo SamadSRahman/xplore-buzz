@@ -12,9 +12,11 @@ import useCTA from "@/hooks/useCTA";
 import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
 import QRPopup from "@/components/QRPopup";
 import { useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function VideoPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [video, setVideo] = useState(null);
   const [annotations, setAnnotations] = useState([]);
   const [currentTime, setCurrentTime] = useState(0);
@@ -90,9 +92,8 @@ export default function VideoPage() {
         selectTime: annotation.startTime,
         endTime: annotation.startTime + 1,
       };
-      setAnnotations(
-        (prev) =>
-          [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
+      setAnnotations((prev) =>
+        [...prev, newAnnotation].sort((a, b) => a.startTime - b.startTime)
       );
       toast.success("Survey added successfully");
     } else {
@@ -230,6 +231,12 @@ export default function VideoPage() {
             </div>
 
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate(`/analytics/video/${id}`)}
+                className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+              >
+                Analytics
+              </button>
               <button className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
                 Save video
               </button>
@@ -289,10 +296,10 @@ export default function VideoPage() {
         isOpen={isQRPopupOpen}
         onClose={() => setIsQRPopupOpen(false)}
         qrCodeUrl={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
-          window?.location?.href
+          `https://xplore-buzz-video-preview.vercel.app/video/${id}`
         )}`}
-        previewUrl={window?.location?.href}
-        linkToCopy={window?.location?.href}
+        previewUrl={`https://xplore-buzz-video-preview.vercel.app/video/${id}`}
+        linkToCopy={`https://xplore-buzz-video-preview.vercel.app/video/${id}`}
       />
     </div>
   );
