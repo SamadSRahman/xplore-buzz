@@ -102,7 +102,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="flex space-x-3 pt-4">
+              {/* <div className="flex space-x-3 pt-4">
                 {editing ? (
                   <>
                     <Button onClick={handleSave} className="bg-purple-gradient text-white">
@@ -119,12 +119,12 @@ export default function ProfilePage() {
                     Edit Profile
                   </Button>
                 )}
-              </div>
+              </div> */}
             </CardContent>
           </Card>
 
           {/* Notification Settings */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Bell className="w-5 h-5" />
@@ -166,10 +166,10 @@ export default function ProfilePage() {
                 />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Security Settings */}
-          <Card className="md:col-span-2">
+          {/* <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="w-5 h-5" />
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                 </Button>
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
         </div>
       </motion.div>
     </div>

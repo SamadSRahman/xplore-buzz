@@ -284,13 +284,13 @@ const AnalyticsPage = () => {
             icon={Target}
             color="indigo"
           />
-          <StatCard
+          {/* <StatCard
             title="Feedback Accuracy"
             value={`${feedback.accuracy}%`}
             subtitle={`${feedback.correctResponses}/${feedback.totalResponses} correct`}
             icon={MessageSquare}
             color="pink"
-          />
+          /> */}
         </div>
 
         {/* Charts Grid */}
@@ -411,12 +411,12 @@ const AnalyticsPage = () => {
                 </div>
                 <div className="text-sm text-purple-800">Correct Responses</div>
               </div>
-              <div className="bg-orange-50 rounded-lg p-4 text-center">
+              {/* <div className="bg-orange-50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-orange-600 mb-1">
                   {feedback.accuracy}%
                 </div>
                 <div className="text-sm text-orange-800">Accuracy Rate</div>
-              </div>
+              </div> */}
             </div>
           </ChartCard>
         </div>
@@ -456,61 +456,52 @@ const AnalyticsPage = () => {
                   className="transform transition-all duration-200 hover:scale-[1.02]"
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">
-                        Question Type:
-                      </span>
-                      <span className="text-sm text-gray-600 capitalize">
-                        {question.optionType.replace("-", " ")}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="text-center">
-                        <div
-                          className={`text-2xl font-bold ${
-                            question.accuracy >= 80
-                              ? "text-green-600"
-                              : question.accuracy >= 50
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
+                    <div className="flex justify-center items-center w-full">
+                      <ResponsiveContainer width="100%" height={250}>
+                        <BarChart
+                          data={question.optionStats}
+                          layout="vertical"
+                          margin={{ top: 20, right: 30, bottom: 20, left: 20 }}
                         >
-                          {question.accuracy}%
-                        </div>
-                        <div className="text-sm text-gray-600">Accuracy</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {question.totalResponses}
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          Total Responses
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-green-600">
-                          Correct: {question.correctResponses}
-                        </span>
-                        <span className="text-red-600">
-                          Incorrect: {question.incorrectResponses}
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            question.accuracy >= 80
-                              ? "bg-green-500"
-                              : question.accuracy >= 50
-                              ? "bg-yellow-500"
-                              : "bg-red-500"
-                          }`}
-                          style={{ width: `${question.accuracy}%` }}
-                        ></div>
-                      </div>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis type="number" allowDecimals={false} />
+                          <YAxis
+                            type="category"
+                            dataKey="option"
+                            width={120}
+                            tick={{ fontSize: 12 }}
+                            interval={0}
+                          />
+                          <Tooltip />
+                          <Bar
+                            dataKey="count"
+                            label={{
+                              position: "right",
+                              fill: "#111827",
+                              fontSize: 12,
+                            }}
+                            isAnimationActive={false}
+                          >
+                            {question.optionStats.map((entry, index) => {
+                              const COLORS = [
+                                "#3B82F6", // blue
+                                "#F59E0B", // amber
+                                "#EF4444", // red
+                                "#8B5CF6", // violet
+                                "#0EA5E9", // sky
+                                "#EC4899", // pink
+                                "#14B8A6", // teal
+                              ];
+                              return (
+                                <Cell
+                                  key={`bar-${index}`}
+                                  fill={COLORS[index % COLORS.length]}
+                                />
+                              );
+                            })}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
 
                     <div className="space-y-2">
@@ -638,7 +629,7 @@ const AnalyticsPage = () => {
                       </div>
                     </div>
 
-                    <div className="p-3 bg-purple-50 rounded-lg">
+                    {/* <div className="p-3 bg-purple-50 rounded-lg">
                       <div className="text-center">
                         <div
                           className={`text-lg font-bold ${
@@ -655,7 +646,7 @@ const AnalyticsPage = () => {
                           Conversion Rate
                         </div>
                       </div>
-                    </div>
+                    </div> */}
 
                     <div className="space-y-2">
                       <h4 className="font-medium text-gray-900 text-sm">
@@ -693,13 +684,15 @@ const AnalyticsPage = () => {
                     <div className="p-2 bg-yellow-50 rounded text-center">
                       <div className="text-sm font-medium text-yellow-800">
                         Avg per User:{" "}
-                        {(cta.totalInteractions / cta.uniqueUsers).toFixed(1)}
+                        {cta.uniqueUsers > 0
+                          ? (cta.totalInteractions / cta.uniqueUsers).toFixed(1)
+                          : "0.0"}
                       </div>
                     </div>
 
-                    <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                    {/* <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
                       <div className="truncate">ID: {cta.ctaId}</div>
-                    </div>
+                    </div> */}
                   </div>
                 </ChartCard>
               ))}
@@ -719,7 +712,7 @@ const AnalyticsPage = () => {
                         filteredCTAs.length - MAX_INITIAL_ITEMS
                       } more)`}
                 </button>
-                </div>
+              </div>
             )}
 
             {filteredCTAs.length === 0 && (
