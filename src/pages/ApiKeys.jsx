@@ -632,17 +632,17 @@ export default function ApiKeysPage() {
                                 <div className="flex items-center gap-4 text-sm text-gray-600">
                                   <div className="flex items-center gap-1">
                                     <Calendar className="h-3 w-3" />
-                                    Last used: {key.lastUsed || "Unknown"}
+                                    Last updated: {key.updated_at || "Unknown"}
                                   </div>
                                   <div className="flex items-center gap-1">
                                     <Activity className="h-3 w-3" />
-                                    Status: {key.hasKey ? "Active" : "Inactive"}
+                                    Status: {key.is_active ? "Active" : "Inactive"}
                                   </div>
                                 </div>
                               </div>
                             </div>
                             <div className="flex items-center gap-6">
-                              <div className="text-right space-y-2">
+                              {!key.is_default && (      <div className="text-right space-y-2">
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -651,7 +651,8 @@ export default function ApiKeysPage() {
                                 >
                                   Set Default
                                 </Button>
-                              </div>
+                              </div>)}
+                        
                               <div className="flex gap-2">
                                 {defaultProvider !== key.id && (
                                   <Button
@@ -668,7 +669,7 @@ export default function ApiKeysPage() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleEditProvider(key)}
-                                    className="p-1 bg-purple-gradient text-white hover:bg-purple-600 rounded-lg"
+                                    className="p-1 bg-purple-gradient text-white hover:bg-purple-600 rounded-lg  px-3"
                                   >
                                     <Edit3 className="h-4 w-4" />
                                   </Button>
@@ -676,7 +677,7 @@ export default function ApiKeysPage() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  className="p-1 bg-gradient-to-br from-red-500 to-red-600 text-white hover:bg-red-700 rounded-lg"
+                                  className="p-1 bg-gradient-to-br from-red-500 to-red-600 text-white hover:bg-red-700 rounded-lg  px-3"
                                   onClick={() => handleDeleteProvider(key)}
                                 >
                                   <Trash2 className="h-4 w-4" />

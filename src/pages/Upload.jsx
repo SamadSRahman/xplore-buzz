@@ -60,10 +60,19 @@ export default function UploadPage() {
         setFileObj(f => f.progress < 95 ? { ...f, progress: f.progress + 5 } : f);
       }, 150);
       const result = await uploadVideo(fileObj.file, title, description);
-      clearInterval(interval);
+      if(result.success){
+              clearInterval(interval);
       setFileObj(f => ({ ...f, status: 'completed', progress: 100 }));
+      console.log("result", result)
       toast.success(result.message);
+      navigate("/videos")
+      }
+      else{
+         toast.error(result.error);
+         setFileObj(f => ({ ...f, status: 'error', progress: 0 }));
+      }
     } catch (err) {
+      console.log("line 67", err)
       toast.error(`Upload failed: ${err.message}`);
       setFileObj(f => ({ ...f, status: 'error', progress: 0 }));
     } finally {
