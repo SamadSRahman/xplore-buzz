@@ -1,6 +1,6 @@
 "use client";
 
-import  { useState } from "react";
+import { useState } from "react";
 import { apiClient } from "../lib/axios";
 import axios from "axios";
 
@@ -79,14 +79,12 @@ export default function useAuth() {
     }
   };
   const resetPassword = async (token, password, confirmPassword) => {
-    console.log("parmas", token
-      , password, confirmPassword
-    );
-    
+    console.log("parmas", token, password, confirmPassword);
+
     try {
       const response = await apiClient.patch(
         `/accounts/reset-password/${token}`,
-        { password,confirm_password: confirmPassword }
+        { password, confirm_password: confirmPassword }
       );
       console.log("response", response.data);
       return response.data;
@@ -97,7 +95,7 @@ export default function useAuth() {
   };
   const logout = async () => {
     let token = "";
-    if(window !== undefined){
+    if (window !== undefined) {
       localStorage.getItem("token");
     }
     // api client not used due to token issue
@@ -111,11 +109,10 @@ export default function useAuth() {
           },
         }
       );
-      window.location.href = "/login"
-      localStorage.removeItem("token")
-      localStorage.removeItem("user")
+      window.location.href = "/login";
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
       return response.data;
-      
     } catch (error) {
       console.error(error.response.data.error);
       return error.response.data;
@@ -144,7 +141,7 @@ export default function useAuth() {
     setLoading(true);
     try {
       const response = await apiClient.post("/accounts/auth/google", {
-        code: token,
+        idToken: token,
       });
       console.log("response", response);
       if (typeof window !== "undefined") {
@@ -164,6 +161,115 @@ export default function useAuth() {
     }
   };
 
+  const changePassword = async (currentPassword, newPassword) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("Authentication token is missing");
+    }
+
+    try {
+      const response = await apiClient.patch(
+        "/accounts/change-password",
+        {
+          current_password: currentPassword,
+          new_password: newPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw new Error(
+        error.response?.data?.error || "Failed to change password"
+      );
+    }
+  };
+
+  const deleteAccount = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      throw new Error("Authentication token is missing");
+    }
+
+    try {
+      const response = await apiClient.delete("/accounts/delete", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Clean up local storage after successful deletion
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Optionally redirect or return response
+      window.location.href = "/"; // or wherever you want
+
+      return response.data;
+    } catch (error) {
+      console.error("Delete account error:", error);
+      throw new Error(
+        error.response?.data?.error || "Failed to delete account"
+      );
+    }
+  };
+
+  const updateProfile = async (name) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) throw new Error("Authentication token is missing");
+
+      const response = await apiClient.patch(
+        "/accounts/profile",
+        { name },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Optionally update localStorage user data
+      const updatedUser = { ...JSON.parse(localStorage.getItem("user")), name };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Failed to update profile"
+      );
+    }
+  };
+
+  const getCurrentUser = async () => {
+  try {
+    const token = localStorage.getItem("token");
+
+    if (!token) throw new Error("Authentication token is missing");
+
+    const response = await apiClient.get("/accounts/current-user", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error || "Failed to fetch current user"
+    );
+  }
+};
+
+
   return {
     login,
     register,
@@ -175,5 +281,9 @@ export default function useAuth() {
     resetPassword,
     forgotPassword,
     googleSignIn,
+    changePassword,
+    deleteAccount,
+    updateProfile,
+    getCurrentUser,
   };
 }

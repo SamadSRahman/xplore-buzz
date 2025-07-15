@@ -119,7 +119,7 @@ export default function UploadPage() {
         <Card
           className={`${dragActive ? 'ring-2 ring-purple-300 bg-purple-50' : 'hover:ring-2 hover:ring-purple-200'} transition-all duration-300 shadow-md rounded-2xl mb-6`}
         >
-          <CardContent className="relative py-16 text-center">
+          <CardContent className="relative py-32 text-center">
             <div
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
