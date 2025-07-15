@@ -237,9 +237,9 @@ export default function VideoPage() {
               >
                 Analytics
               </button>
-              <button className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
+              {/* <button className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
                 Save video
-              </button>
+              </button> */}
               <button
                 onClick={() => setIsQRPopupOpen(true)}
                 className="bg-purple-gradient text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"

@@ -19,7 +19,7 @@ const navItems = [
   { name: "API Keys", href: "/api-keys", icon: KeyRound },
 ];
 
-const UserAvatar = ({ user, isCollapsed }) => {
+const UserAvatar = ({ user }) => {
   const getInitials = (name) => {
     if (!name) return "U";
     const names = name.trim().split(/\s+/);
@@ -31,23 +31,21 @@ const UserAvatar = ({ user, isCollapsed }) => {
 
   return (
     <div className="flex items-center p-2">
-      <div className="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold">
-        {getInitials(user?.name)}
+      {user?.profilePic ? (
+        <img
+          src={user.profilePicture}
+          alt={`${user.name}'s profile`}
+          className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+        />
+      ) : (
+        <div className="w-10 h-10 rounded-full bg-purple-500 text-white flex items-center justify-center font-bold flex-shrink-0">
+          {getInitials(user?.name)}
+        </div>
+      )}
+      <div className="ml-3 flex flex-col justify-center min-w-0">
+        <p className="font-semibold text-sm text-gray-900 truncate">{user?.name}</p>
+        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
       </div>
-      <AnimatePresence>
-        {!isCollapsed && (
-          <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: "auto" }}
-            exit={{ opacity: 0, width: 0 }}
-            transition={{ duration: 0.2 }}
-            className="ml-3"
-          >
-            <p className="font-semibold text-sm">{user?.name}</p>
-            <p className="text-xs text-gray-500">{user?.email}</p>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 };
@@ -91,29 +89,11 @@ export default function Sidebar() {
     <motion.div
       layout
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className={`fixed bg-white border-r border-gray-200 flex flex-col z-40 h-screen ${
-        isCollapsed ? "w-20" : "w-64"
-      }`}
+      className="fixed bg-white border-r border-gray-200 flex flex-col z-40 h-screen w-64"
     >
-      {/* Collapse Toggle */}
-      {/* <div className="absolute -right-3 top-16">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="rounded-full bg-white"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
-      </div> */}
-
       {/* User Profile */}
-      <div className="pt-20 px-4">
-        {user && <UserAvatar user={user} isCollapsed={isCollapsed} />}
+      <div className="pt-20 px-2">
+        {user && <UserAvatar user={user} isCollapsed={false} />}
       </div>
 
       {/* Navigation */}
@@ -127,28 +107,16 @@ export default function Sidebar() {
                 isActive(item.href)
                   ? "bg-purple-100 text-purple-600"
                   : "text-gray-600 hover:bg-gray-100"
-              } ${isCollapsed ? "justify-center" : ""}`}
+              }`}
             >
               <item.icon className="h-5 w-5" />
-              <AnimatePresence>
-                {!isCollapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: "auto" }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="ml-3"
-                  >
-                    {item.name}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+              <span className="ml-3">{item.name}</span>
             </Link>
           ))}
         </nav>
       </div>
 
-      {/* Footer (Logout) */}
+      {/* Footer (Profile & Logout) */}
       <div className="p-4 border-t border-gray-200">
         <Link
           to="/profile"
@@ -156,43 +124,17 @@ export default function Sidebar() {
             isActive("/profile")
               ? "bg-purple-100 text-purple-600"
               : "text-gray-600 hover:bg-gray-100"
-          } ${isCollapsed ? "justify-center" : ""}`}
+          }`}
         >
           <User className="h-5 w-5" />
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.2 }}
-                className="ml-3"
-              >
-                Profile
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <span className="ml-3">Profile</span>
         </Link>
         <button
           onClick={handleLogout}
-          className={`flex items-center w-full mt-2 p-2 rounded-lg transition-colors text-gray-600 hover:bg-red-100 hover:text-red-600 ${
-            isCollapsed ? "justify-center" : ""
-          }`}
+          className="flex items-center w-full mt-2 p-2 rounded-lg transition-colors text-gray-600 hover:bg-red-100 hover:text-red-600"
         >
           <LogOut className="h-5 w-5" />
-          <AnimatePresence>
-            {!isCollapsed && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: "auto" }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.2 }}
-                className="ml-3"
-              >
-                Logout
-              </motion.span>
-            )}
-          </AnimatePresence>
+          <span className="ml-3">Logout</span>
         </button>
       </div>
     </motion.div>

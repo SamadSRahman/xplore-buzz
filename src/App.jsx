@@ -20,8 +20,6 @@ import Analytics from "./pages/Analytics";
 
 function App() {
   const location = useLocation();
-  // const showSidebar = location.pathname !== "/";
-
   const sidebarHiddenRoutes = [
     "/",
     "/login",
@@ -40,7 +38,7 @@ function App() {
       <Navbar />
       <div className="flex">
         {showSidebar && <Sidebar />}
-        <main className={`flex-grow pt-16 ${location.pathname==="/"?"":"pl-60"} `}>
+        <main className={`flex-grow pt-16 ${showSidebar ? "pl-60" : ""}`}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
