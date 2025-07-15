@@ -231,7 +231,7 @@ export default function ProfilePage() {
                 >
                   Change Password
                 </Button>
-                <Button
+                {/* <Button
                   variant="outline"
                   className="justify-start"
                   onClick={() => alert("Two-Factor Authentication feature coming soon!")}
@@ -244,7 +244,7 @@ export default function ProfilePage() {
                   onClick={() => alert("Login History feature coming soon!")}
                 >
                   Login History
-                </Button>
+                </Button> */}
                 <Button
                   variant="outline"
                   className="justify-start text-red-600 border-red-200 hover:bg-red-50"

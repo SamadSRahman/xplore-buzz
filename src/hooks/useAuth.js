@@ -94,14 +94,15 @@ export default function useAuth() {
     }
   };
   const logout = async () => {
-    let token = "";
-    if (window !== undefined) {
-      localStorage.getItem("token");
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    if (!token) {
+      throw new Error("Authentication token is missing");
     }
-    // api client not used due to token issue
+
     try {
-      const response = await axios.post(
-        "https://prompthkit.apprikart.com/api/v1/xplore/accounts/logout",
+      await apiClient.post(
+        "/accounts/logout",
         {},
         {
           headers: {
@@ -109,13 +110,17 @@ export default function useAuth() {
           },
         }
       );
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+      }
       window.location.href = "/login";
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      return response.data;
     } catch (error) {
-      console.error(error.response.data.error);
-      return error.response.data;
+      console.error(
+        "Logout error:",
+        error.response?.data?.error || error.message
+      );
+      throw new Error(error.response?.data?.error || "Failed to logout");
     }
   };
 
@@ -250,25 +255,24 @@ export default function useAuth() {
   };
 
   const getCurrentUser = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    if (!token) throw new Error("Authentication token is missing");
+      if (!token) throw new Error("Authentication token is missing");
 
-    const response = await apiClient.get("/accounts/current-user", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const response = await apiClient.get("/accounts/current-user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    return response.data;
-  } catch (error) {
-    throw new Error(
-      error.response?.data?.error || "Failed to fetch current user"
-    );
-  }
-};
-
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.error || "Failed to fetch current user"
+      );
+    }
+  };
 
   return {
     login,
