@@ -57,11 +57,21 @@ export default function Sidebar() {
   const [user, setUser] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, getCurrentUser } = useAuth();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    setUser(storedUser ? JSON.parse(storedUser) : null);
+    const fetchUser = async () => {
+      try {
+        const data = await getCurrentUser();
+        console.log("Fetched user:", data); // Optional: debug log
+        setUser(data.user || null);
+      } catch (err) {
+        console.error("Failed to fetch current user:", err.message);
+        setUser(null);
+      }
+    };
+
+    fetchUser();
   }, []);
 
   const handleLogout = async () => {

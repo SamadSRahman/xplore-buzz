@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,7 +26,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigate();
-  const { register, loading, error } = useAuth();
+  const { register, googleSignIn, loading, error } = useAuth();
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -65,6 +65,43 @@ export default function RegisterPage() {
       toast.error(error.message || "Registration failed");
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id:
+          "135383393969-o1s2vecpf1n41sh4jngrhhvdf7l9en84.apps.googleusercontent.com",
+        callback: handleGoogleCallback,
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("google-signin-button"),
+        {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+        }
+      );
+    }
+  }, []);
+
+  const handleGoogleCallback = async (response) => {
+    console.log("Google ID Token:", response.credential);
+
+    try {
+      // response.credential is the JWT ID token
+      const result = await googleSignIn(response.credential);
+
+      if (result.success) {
+        toast.success("Google sign-in successful!");
+        navigate("/videos");
+      } else {
+        toast.error("Google sign-in failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Google sign-in failed");
     }
   };
 
@@ -212,6 +249,8 @@ export default function RegisterPage() {
               >
                 {loading ? "Creating account..." : "Create Account"}
               </Button>
+
+              <div id="google-signin-button" className="w-full"></div>
             </form>
 
             <div className="mt-6 text-center">

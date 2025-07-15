@@ -1,58 +1,86 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { User, Mail, Bell, Shield, Save, Edit } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { toast } from 'sonner';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { User, Mail, Bell, Shield, Save, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { toast } from "sonner";
+import PasswordChangePopup from "./PasswordChangePopup";
+import DeleteAccountPopup from "./DeleteAccountPopup";
+import useAuth from "../hooks/useAuth";
 
 export default function ProfilePage() {
+  const { updateProfile } = useAuth();
   const [user, setUser] = useState(null);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    name: 'Demo User',
-    email: 'demo@buzz.com',
+    name: "Demo User",
+    email: "demo@buzz.com",
   });
   const [settings, setSettings] = useState({
     emailNotifications: true,
     pushNotifications: false,
     marketingEmails: false,
   });
+  const [showPasswordPopup, setShowPasswordPopup] = useState(false);
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
       setFormData({
-        name: parsedUser?.name || 'Demo User',
-        email: parsedUser?.email || 'demo@buzz.com',
+        name: parsedUser?.name || "Demo User",
+        email: parsedUser?.email || "demo@buzz.com",
       });
     }
   }, []);
 
-  const handleSave = () => {
-    toast.success('Profile updated successfully');
-    setEditing(false);
+  const handleSave = async () => {
+    try {
+      await updateProfile(formData.name); // ✅ Call the updateProfile API
+      toast.success("Profile updated successfully");
+      setEditing(false);
+
+      // Optional: Update localStorage
+      const updatedUser = { ...user, name: formData.name };
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setUser(updatedUser);
+    } catch (err) {
+      toast.error(err.message || "Failed to update profile");
+    }
   };
 
   const handleSettingChange = (setting, value) => {
     setSettings((prev) => ({ ...prev, [setting]: value }));
-    toast.success('Settings updated');
+    toast.success("Settings updated");
   };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-8"
+      >
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-buzz-gradient bg-clip-text text-transparent">
             Profile Settings
           </h1>
-          <p className="text-gray-600">Manage your account settings and preferences</p>
+          <p className="text-gray-600">
+            Manage your account settings and preferences
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -63,7 +91,9 @@ export default function ProfilePage() {
                 <User className="w-5 h-5" />
                 <span>Profile Information</span>
               </CardTitle>
-              <CardDescription>Update your personal information and contact details</CardDescription>
+              <CardDescription>
+                Update your personal information and contact details
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-center mb-6">
@@ -75,28 +105,38 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-4">
+                {/* Name */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Full Name</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Full Name
+                  </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       value={formData.name}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
+                      }
                       disabled={!editing}
                       className="pl-10"
                     />
                   </div>
                 </div>
 
+                {/* Email (disabled always) */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email Address</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Email Address
+                  </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
                       value={formData.email}
-                      onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                      disabled={!editing}
-                      className="pl-10"
+                      disabled
+                      className="pl-10 bg-gray-100 cursor-not-allowed text-gray-500"
                     />
                   </div>
                 </div>
@@ -105,7 +145,10 @@ export default function ProfilePage() {
               <div className="flex space-x-3 pt-4">
                 {editing ? (
                   <>
-                    <Button onClick={handleSave} className="bg-purple-gradient text-white">
+                    <Button
+                      onClick={handleSave}
+                      className="bg-purple-gradient text-white"
+                    >
                       <Save className="w-4 h-4 mr-2" />
                       Save Changes
                     </Button>
@@ -124,7 +167,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Notification Settings */}
-          <Card>
+          {/* <Card>
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Bell className="w-5 h-5" />
@@ -166,7 +209,7 @@ export default function ProfilePage() {
                 />
               </div>
             </CardContent>
-          </Card>
+          </Card> */}
 
           {/* Security Settings */}
           <Card className="md:col-span-2">
@@ -175,20 +218,38 @@ export default function ProfilePage() {
                 <Shield className="w-5 h-5" />
                 <span>Security</span>
               </CardTitle>
-              <CardDescription>Manage your account security settings</CardDescription>
+              <CardDescription>
+                Manage your account security settings
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button variant="outline" className="justify-start">
+                <Button
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() => setShowPasswordPopup(true)}
+                >
                   Change Password
                 </Button>
-                <Button variant="outline" className="justify-start">
+                <Button
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() => alert("Two-Factor Authentication feature coming soon!")}
+                >
                   Two-Factor Authentication
                 </Button>
-                <Button variant="outline" className="justify-start">
+                <Button
+                  variant="outline"
+                  className="justify-start"
+                  onClick={() => alert("Login History feature coming soon!")}
+                >
                   Login History
                 </Button>
-                <Button variant="outline" className="justify-start text-red-600 border-red-200 hover:bg-red-50">
+                <Button
+                  variant="outline"
+                  className="justify-start text-red-600 border-red-200 hover:bg-red-50"
+                  onClick={() => setShowDeletePopup(true)}
+                >
                   Delete Account
                 </Button>
               </div>
@@ -196,6 +257,14 @@ export default function ProfilePage() {
           </Card>
         </div>
       </motion.div>
+      <PasswordChangePopup
+        open={showPasswordPopup}
+        onClose={() => setShowPasswordPopup(false)}
+      />
+      <DeleteAccountPopup
+        isOpen={showDeletePopup}
+        onClose={() => setShowDeletePopup(false)}
+      />
     </div>
   );
 }

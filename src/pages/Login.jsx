@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Globe } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,13 +15,42 @@ import {
 } from "@/components/ui/card";
 import { toast } from "sonner";
 import useAuth from "@/hooks/useAuth";
+import { useGoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { login, loading, error } = useAuth();
+  const { login, googleSignIn, loading, error } = useAuth();
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    console.log("Google login success:", tokenResponse);
+
+    const authCode = tokenResponse?.code; // ✅ This is the Google auth code
+
+    // Now pass it to your hook:
+    const result = await googleSignIn(authCode);
+
+    console.log("Result from googleSignIn:", result);
+
+    if (result.success) {
+      navigate("/videos");
+    } else {
+      toast.error("Google sign-in failed.");
+    }
+  };
+
+  const handleGoogleError = (err) => {
+    console.error("Google OAuth error", err);
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: handleGoogleError,
+    scope: "profile email", // request profile + email
+    flow: "auth-code", // or 'auth-code' if you want a code to exchange server-side
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,6 +69,84 @@ export default function LoginPage() {
     } catch (error) {
       toast.error(error.message || "Login failed");
     } finally {
+    }
+  };
+
+  // ✅ GOOGLE SIGN IN SETUP
+  // useEffect(() => {
+  //   /* global google */
+  //   if (window.google) {
+  //     google.accounts.id.initialize({
+  //       client_id:
+  //         "135383393969-o1s2vecpf1n41sh4jngrhhvdf7l9en84.apps.googleusercontent.com",
+  //       callback: handleGoogleCallback,
+  //     });
+
+  //     google.accounts.id.renderButton(
+  //       document.getElementById("google-signin"),
+  //       {
+  //         theme: "outline",
+  //         size: "large",
+  //         width: "250",
+  //       }
+  //     );
+
+  //     google.accounts.id.prompt(); // optional
+  //   }
+  // }, []);
+
+  // const handleGoogleCallback = async (response) => {
+  //   console.log("Google ID Token:", response.credential);
+  //   try {
+  //     const result = await googleSignIn(response.credential);
+  //     if (result.success) {
+  //       toast.success("Google sign-in successful!");
+  //       navigate("/videos");
+  //     } else {
+  //       toast.error("Google sign-in failed");
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message || "Google sign-in failed");
+  //   }
+  // };
+
+  // ✅ OPTION 2: Using Google Identity Services (if you prefer this approach)
+  // Comment out the above googleLogin if using this approach
+
+  useEffect(() => {
+    if (window.google) {
+      google.accounts.id.initialize({
+        client_id:
+          "135383393969-o1s2vecpf1n41sh4jngrhhvdf7l9en84.apps.googleusercontent.com",
+        callback: handleGoogleCallback,
+      });
+
+      google.accounts.id.renderButton(
+        document.getElementById("google-signin-button"),
+        {
+          theme: "outline",
+          size: "large",
+          width: "100%",
+        }
+      );
+    }
+  }, []);
+
+  const handleGoogleCallback = async (response) => {
+    console.log("Google ID Token:", response.credential);
+
+    try {
+      // response.credential is the JWT ID token
+      const result = await googleSignIn(response.credential);
+
+      if (result.success) {
+        toast.success("Google sign-in successful!");
+        navigate("/videos");
+      } else {
+        toast.error("Google sign-in failed");
+      }
+    } catch (error) {
+      toast.error(error.message || "Google sign-in failed");
     }
   };
 
@@ -129,6 +236,16 @@ export default function LoginPage() {
               >
                 {loading ? "Signing in..." : "Sign In"}
               </Button>
+
+              {/* <Button
+                onClick={() => googleLogin()}
+                variant="outline"
+                className="w-fit flex items-center justify-center gap-2 border border-gray-300 hover:bg-gray-50 m-auto"
+              >
+                <Globe size={18} /> Sign In with Google
+              </Button> */}
+
+              <div id="google-signin-button" className="w-full"></div>
             </form>
 
             <div className="mt-6 text-center">
