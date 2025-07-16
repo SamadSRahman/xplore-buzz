@@ -23,7 +23,7 @@ export default function useVideo() {
       return response.data;
     } catch (error) {
       console.error("Error uploading video:", error);
-      return error.response.data
+      return error.response.data;
       // throw new Error("Video upload failed");
     }
   };
@@ -51,12 +51,45 @@ export default function useVideo() {
     }
   };
 
+  // const updateVideo = async (id, thumbnail, title, description, video) => {
+  //   const formData = new FormData();
+  //   if (thumbnail) formData.append("image", thumbnail);
+  //   if (title) formData.append("title", title);
+  //   if (description) formData.append("description", description);
+  //   if (video) formData.append("video", video);
+  //   try {
+  //     const response = await apiClientWithAuth.patch(
+  //       `/videos/${id}`,
+  //       formData,
+  //       {
+  //         headers: {
+  //           "Content-Type": "multipart/form-data",
+  //         },
+  //       }
+  //     );
+  //     // console.log('response from update video', response.data)
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("error updated video", error.response.data);
+  //   }
+  // };
+
   const updateVideo = async (id, thumbnail, title, description, video) => {
     const formData = new FormData();
-    if (thumbnail) formData.append("image", thumbnail);
-    if (title) formData.append("title", title);
-    if (description) formData.append("description", description);
-    if (video) formData.append("video", video);
+
+    if (thumbnail !== undefined && thumbnail !== null) {
+      formData.append("image", thumbnail);
+    }
+    if (title !== undefined && title !== null) {
+      formData.append("title", title);
+    }
+    if (description !== undefined && description !== null) {
+      formData.append("description", description);
+    }
+    if (video !== undefined && video !== null) {
+      formData.append("video", video);
+    }
+
     try {
       const response = await apiClientWithAuth.patch(
         `/videos/${id}`,
@@ -67,10 +100,10 @@ export default function useVideo() {
           },
         }
       );
-      // console.log('response from update video', response.data)
       return response.data;
     } catch (error) {
-      console.error("error updated video", error.response.data);
+      console.error("error updating video", error.response?.data);
+      return { success: false, error: error.response?.data };
     }
   };
 
