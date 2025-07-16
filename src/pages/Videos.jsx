@@ -163,7 +163,6 @@ export default function VideoListPage() {
                     >
                       <BarChart2 className="w-4 h-4 text-purple-500" />
                     </Button>
-
                     <Button
                       variant="ghost"
                       size="icon"

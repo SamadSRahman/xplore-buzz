@@ -13,6 +13,7 @@ import { useFeedBackQuestion } from "@/hooks/useFeedBackQuestion";
 import QRPopup from "@/components/QRPopup";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Pencil, Check, Save } from "lucide-react";
 
 export default function VideoPage() {
   const { id } = useParams();
@@ -24,8 +25,10 @@ export default function VideoPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [videoDuration, setVideoDuration] = useState(0);
   const [isQRPopupOpen, setIsQRPopupOpen] = useState(false);
+  const [isEditingTitle, setIsEditingTitle] = useState(false);
+  const [editedTitle, setEditedTitle] = useState("");
 
-  const { getVideoById } = useVideo();
+  const { getVideoById, updateVideo } = useVideo();
   const { addCTA, deleteCTA, updateCTA } = useCTA();
   const {
     addFeedBackQuestion,
@@ -166,6 +169,39 @@ export default function VideoPage() {
     }
   };
 
+  const handleEditClick = () => {
+    setEditedTitle(video.title);
+    setIsEditingTitle(true);
+  };
+
+  const handleSaveTitle = async () => {
+    if (editedTitle.trim() === "") {
+      toast.error("Title cannot be empty");
+      return;
+    }
+
+    try {
+      const result = await updateVideo(
+        id,
+        undefined,
+        editedTitle,
+        undefined,
+        undefined
+      );
+      if (result.success) {
+        setVideo({ ...video, title: editedTitle });
+        toast.success("Title updated successfully");
+      } else {
+        toast.error("Failed to update title");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Error updating title");
+    } finally {
+      setIsEditingTitle(false);
+    }
+  };
+
   const getActiveAnnotations = () => {
     return annotations.filter(
       (ann) => currentTime >= ann.startTime && currentTime <= ann.endTime
@@ -205,7 +241,7 @@ export default function VideoPage() {
         >
           {/* Header */}
           <div className="flex items-center justify-between">
-            <div>
+            {/* <div>
               <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
                 {video.title}
                 <button className="text-gray-400 hover:text-gray-600">
@@ -224,6 +260,41 @@ export default function VideoPage() {
                   </svg>
                 </button>
               </h1>
+              <p className="text-gray-600 text-sm mt-1">
+                From {new Date(video.createdAt).toLocaleDateString()} •{" "}
+                {video.duration || "7days"}
+              </p>
+            </div> */}
+
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                {isEditingTitle ? (
+                  <input
+                    type="text"
+                    value={editedTitle}
+                    onChange={(e) => setEditedTitle(e.target.value)}
+                    className="border border-gray-300 rounded px-2 py-1 text-base"
+                  />
+                ) : (
+                  video.title
+                )}
+                {isEditingTitle ? (
+                  <button
+                    onClick={handleSaveTitle}
+                    className="px-3 py-1.5 rounded-md text-sm font-medium ml-2 bg-purple-gradient text-white hover:opacity-90 transition-opacity"
+                  >
+                    Save
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleEditClick}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <Pencil className="w-5 h-5" />
+                  </button>
+                )}
+              </h1>
+
               <p className="text-gray-600 text-sm mt-1">
                 From {new Date(video.createdAt).toLocaleDateString()} •{" "}
                 {video.duration || "7days"}

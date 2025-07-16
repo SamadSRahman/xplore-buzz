@@ -38,7 +38,7 @@ function App() {
       <Navbar />
       <div className="flex">
         {showSidebar && <Sidebar />}
-        <main className={`flex-grow pt-16 ${showSidebar ? "pl-60" : ""}`}>
+        <main className={`flex-grow pt-16 ${showSidebar ? "pl-64" : ""}`}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
