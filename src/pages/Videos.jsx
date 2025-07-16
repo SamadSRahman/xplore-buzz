@@ -109,7 +109,7 @@ export default function VideoListPage() {
                   <Play className="w-4 h-4 text-purple-600" />
                 </Button>
               </div>
-              <CardContent className="p-4 space-y-2">
+              <CardContent className="p-4 space-y-2 min-h-[110px]">
                 <CardTitle className="text-lg truncate">
                   {video.title}
                 </CardTitle>
@@ -174,12 +174,12 @@ export default function VideoListPage() {
                 </div>
               </CardFooter>
 
-              <div className="px-4 pb-4 text-xs text-gray-400">
+              {/* <div className="px-4 pb-4 text-xs text-gray-400">
                 Uploaded{" "}
                 {formatDistanceToNow(new Date(video.createdAt), {
                   addSuffix: true,
                 })}
-              </div>
+              </div> */}
             </Card>
           </motion.div>
         ))}
