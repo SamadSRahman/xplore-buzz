@@ -212,7 +212,7 @@ export default function ProfilePage() {
           </Card> */}
 
           {/* Security Settings */}
-          <Card className="md:col-span-2">
+          <Card >
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Shield className="w-5 h-5" />
@@ -223,7 +223,7 @@ export default function ProfilePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col space-y-4">
                 <Button
                   variant="outline"
                   className="justify-start"
