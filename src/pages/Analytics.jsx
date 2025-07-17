@@ -244,7 +244,7 @@ const AnalyticsPage = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 mb-8">
+        <div className="flex flex-wrap gap-6 mb-8 justify-center items-center">
           <StatCard
             title="Total Views"
             value={overview.totalViews.toLocaleString()}
@@ -388,32 +388,32 @@ const AnalyticsPage = () => {
 
         {/* Feedback Summary */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <ChartCard title="Feedback Summary" className="lg:col-span-3">
-            <div className="grid grid-cols-1 md grid-cols-4 gap-6">
-              <div className="bg-blue-50 rounded-lg p-4 text-center">
+          <ChartCard title="Feedback Summary" className="lg:col-span-3 w-full">
+            <div className="flex flex-wrap justify-center items-stretch gap-6 w-full">
+              <div className="flex-1 min-w-[200px] max-w-xs bg-blue-50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600 mb-1">
                   {feedback.totalResponses}
                 </div>
                 <div className="text-sm text-blue-800">Total Responses</div>
               </div>
-              <div className="bg-green-50 rounded-lg p-4 text-center">
+              <div className="flex-1 min-w-[200px] max-w-xs bg-green-50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-green-600 mb-1">
                   {feedback.uniqueRespondents}
                 </div>
                 <div className="text-sm text-green-800">Unique Respondents</div>
               </div>
-              <div className="bg-purple-50 rounded-lg p-4 text-center">
+              <div className="flex-1 min-w-[200px] max-w-xs bg-purple-50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-purple-600 mb-1">
                   {feedback.correctResponses}
                 </div>
                 <div className="text-sm text-purple-800">Correct Responses</div>
               </div>
               {/* <div className="bg-orange-50 rounded-lg p-4 text-center">
-                <div className="text-2xl font-bold text-orange-600 mb-1">
-                  {feedback.accuracy}%
-                </div>
-                <div className="text-sm text-orange-800">Accuracy Rate</div>
-              </div> */}
+        <div className="text-2xl font-bold text-orange-600 mb-1">
+          {feedback.accuracy}%
+        </div>
+        <div className="text-sm text-orange-800">Accuracy Rate</div>
+      </div> */}
             </div>
           </ChartCard>
         </div>
