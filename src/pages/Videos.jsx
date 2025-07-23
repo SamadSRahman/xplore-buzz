@@ -103,10 +103,13 @@ export default function VideoListPage() {
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50"
+                  disabled={video.status !== "ready"}
+                  className={`absolute bottom-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-gray-50
+                    ${video.status !== "ready" ? "opacity-50 cursor-not-allowed" : ""}
+                  `}
                   onClick={() => navigate(`/video/${video.id}`)}
                 >
-                  <Play className="w-4 h-4 text-purple-600" />
+                  <Play className={`w-4 h-4 ${video.status !== "ready" ? "text-gray-400" : "text-purple-600"}`} />
                 </Button>
               </div>
               <CardContent className="p-4 space-y-2">
