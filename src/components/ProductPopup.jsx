@@ -68,7 +68,7 @@ export default function ProductPopup({ annotation, onClose }) {
                 <img
                   src={imageSrc}
                   alt={annotation.productName || 'Product'}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   onError={(e) => {
                     console.error('Image failed to load:', imageSrc);
                     // Fallback to placeholder if image fails to load
