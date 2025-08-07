@@ -12,8 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 // Edit Product Annotation Popup
 export default function EditProductPopup({
@@ -24,7 +29,7 @@ export default function EditProductPopup({
 }) {
   const [form, setForm] = useState({});
   const [dirty, setDirty] = useState({});
-    const inputRef = useRef(null);
+  const inputRef = useRef(null);
   useEffect(() => {
     console.log("selected annotation:", selectedAnnotation);
 
@@ -72,19 +77,22 @@ export default function EditProductPopup({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent  className="max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 z-50">
+      <DialogContent className="max-w-lg fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white  rounded-lg shadow-lg p-6 z-50">
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-50">
+          <DialogTitle
+            className="text-xl font-semibold"
+            style={{ color: "black" }}
+          >
             Edit Product Annotation
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Product Name */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label
               htmlFor="productName"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="text-sm font-medium text-gray-700 "
             >
               Product Name
             </Label>
@@ -92,16 +100,16 @@ export default function EditProductPopup({
               id="productName"
               value={form.productName}
               onChange={(e) => handleChange("productName", e.target.value)}
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
               placeholder="Enter product name"
             />
           </div>
 
           {/* Product URL */}
-          <div className="space-y-2">
+          <div className="space-y-1">
             <Label
               htmlFor="productUrl"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="text-sm font-medium text-gray-700"
             >
               Product URL
             </Label>
@@ -109,7 +117,7 @@ export default function EditProductPopup({
               id="productUrl"
               value={form.productUrl}
               onChange={(e) => handleChange("productUrl", e.target.value)}
-              className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+              className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
               placeholder="https://example.com/product"
             />
           </div>
@@ -118,7 +126,7 @@ export default function EditProductPopup({
           <div className="space-y-3">
             <Label
               htmlFor="image"
-              className="text-sm font-medium text-gray-700 dark:text-gray-300"
+              className="text-sm font-medium text-gray-700 "
             >
               Product Image
             </Label>
@@ -126,12 +134,16 @@ export default function EditProductPopup({
             {/* Image Preview */}
             {form.imageUrl && (
               <div className="relative group">
-                <div className="relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
+                <div className="relative overflow-hidden rounded-lg border border-gray-200  bg-gray-50">
                   <img
-                  width={200}
-                  height={200}
-                  onClick={()=>inputRef.current.click()}
-                    src={typeof form.imageUrl === "string" ? form.imageUrl : URL.createObjectURL(form.imageUrl)}
+                    width={200}
+                    height={200}
+                    onClick={() => inputRef.current.click()}
+                    src={
+                      typeof form.imageUrl === "string"
+                        ? form.imageUrl
+                        : URL.createObjectURL(form.imageUrl)
+                    }
                     alt="Product preview"
                     className="w-full h-32 object-contain transition-transform duration-200 group-hover:scale-105"
                     onError={(e) => {
@@ -140,7 +152,7 @@ export default function EditProductPopup({
                     }}
                   />
                   {/* Fallback for broken images */}
-                  <div className="hidden w-full h-32 items-center justify-center bg-gray-100 dark:bg-gray-800">
+                  <div className="hidden w-full h-32 items-center justify-center bg-gray-100">
                     <div className="text-center">
                       <svg
                         className="mx-auto h-8 w-8 text-gray-400"
@@ -170,19 +182,19 @@ export default function EditProductPopup({
                 id="image"
                 type="file"
                 accept="image/*"
-               ref={inputRef}
+                ref={inputRef}
                 onChange={handleFileChange}
-                className="hidden w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 dark:file:bg-purple-900/20 dark:file:text-purple-400"
+                className="hidden w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
               />
             </div>
           </div>
 
           {/* Time Inputs */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label
                 htmlFor="startTime"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-gray-700"
               >
                 Start Time
               </Label>
@@ -196,7 +208,7 @@ export default function EditProductPopup({
                     handleChange("startTime", newTime);
                   }}
                   placeholder="00:00"
-                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono text-center"
+                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono text-center"
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                   <svg
@@ -216,10 +228,10 @@ export default function EditProductPopup({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label
                 htmlFor="endTime"
-                className="text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="text-sm font-medium text-gray-700"
               >
                 End Time
               </Label>
@@ -233,7 +245,7 @@ export default function EditProductPopup({
                     handleChange("endTime", newTime);
                   }}
                   placeholder="00:00"
-                  className="w-full px-3 py-2.5 bg-gray-50 dark:bg-gray-900/50 border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono text-center"
+                  className="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono text-center"
                 />
                 <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                   <svg
@@ -252,49 +264,60 @@ export default function EditProductPopup({
                 </div>
               </div>
             </div>
-              <div className="space-y-2 col-span-2">
-                    <label className="block text-sm font-medium mb-2">
-                      Position
-                    </label>
-                    <Select
-                      value={form.position}
-                      onValueChange={(value) =>
-                        handleChange("position", value)
-                      }
-                    >
-                      <SelectTrigger className="bg-gray-50 border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
-                        <SelectValue placeholder="Select position..." />
-                      </SelectTrigger>
-                    <SelectContent 
-            className="bg-white border border-gray-200 rounded-md shadow-md cursor-pointer z-[99999]"
-            container={document.body}
-          >
-                      <SelectItem value="top-left" className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors">
-              Top Left
-            </SelectItem>
-            <SelectItem value="top-right" className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors">
-              Top Right
-            </SelectItem>
-            <SelectItem value="bottom-left" className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors">
-              Bottom Left
-            </SelectItem>
-            <SelectItem value="bottom-right" className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors">
-              Bottom Right
-            </SelectItem>
-            <SelectItem value="center" className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors">
-              Center
-            </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="space-y-1 col-span-2">
+              <label className="block text-sm font-medium mb-2">Position</label>
+              <Select
+                value={form.position}
+                onValueChange={(value) => handleChange("position", value)}
+              >
+                <SelectTrigger className="bg-gray-50 border border-gray-300 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer">
+                  <SelectValue placeholder="Select position..." />
+                </SelectTrigger>
+                <SelectContent
+                  className="bg-white border border-gray-200 rounded-md shadow-md cursor-pointer z-[99999]"
+                  container={document.body}
+                >
+                  <SelectItem
+                    value="top-left"
+                    className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors"
+                  >
+                    Top Left
+                  </SelectItem>
+                  <SelectItem
+                    value="top-right"
+                    className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors"
+                  >
+                    Top Right
+                  </SelectItem>
+                  <SelectItem
+                    value="bottom-left"
+                    className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors"
+                  >
+                    Bottom Left
+                  </SelectItem>
+                  <SelectItem
+                    value="bottom-right"
+                    className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors"
+                  >
+                    Bottom Right
+                  </SelectItem>
+                  <SelectItem
+                    value="center"
+                    className="hover:bg-purple-50 px-3 py-2 rounded-md transition-colors"
+                  >
+                    Center
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
-        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end">
+        <DialogFooter className="flex-col-reverse sm:flex-row gap-2 sm:gap-3 justify-end items-center">
           <Button
             variant="outline"
             onClick={onClose}
-            className="mt-2 w-full sm:w-auto px-6 py-2.5 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+            className=" w-full sm:w-auto px-6 py-2.5 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg transition-all duration-200"
           >
             Cancel
           </Button>

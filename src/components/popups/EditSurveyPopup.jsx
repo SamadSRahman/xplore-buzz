@@ -131,15 +131,15 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
 
   return (
     <Dialog className="h-max-screen" open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 z-50">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg p-6 z-50" >
         <DialogHeader>
-          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-gray-50">
+          <DialogTitle className="text-xl font-semibold" style={{color: 'black'}}>
             Edit Survey Question
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
-          <div>
+          <div className="space-y-1">
             <Label htmlFor="question">Question</Label>
             <Textarea
               id="question"
@@ -150,7 +150,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
             />
           </div>
 
-          <div>
+          <div className="space-y-1">
             <Label htmlFor="type">Option Type</Label>
             <Select
               value={form.type}
@@ -167,7 +167,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
           </div>
 
           {["single-choice", "multiple-choice"].includes(form.type) && (
-            <div className="space-y-2">
+            <div className="space-y-1">
               <Label>Options</Label>
 
               {/* Add new option */}
@@ -264,7 +264,7 @@ function EditSurveyPopup({ open, selectedAnnotation, onClose, onUpdate }) {
             </div>
           )}
 
-          <div>
+          <div className="space-y-1">
             <Label htmlFor="startTime">Start Time</Label>
             <div className="relative">
               <Input

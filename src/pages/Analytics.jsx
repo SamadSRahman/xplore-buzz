@@ -235,7 +235,7 @@ const AnalyticsPage = () => {
               >
                 <option value="30d">Last 30 days</option>
                 <option value="7d">Last 7 days</option>
-                <option value="24h">Last 24 hours</option>
+                <option value="1d">Last 24 hours</option>
               </select>
             </div>
           </div>
@@ -599,7 +599,7 @@ const AnalyticsPage = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            {/* <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
               {displayedCTAs.map((cta, index) => (
                 <ChartCard
                   key={cta.ctaId}
@@ -625,25 +625,6 @@ const AnalyticsPage = () => {
                         </div>
                       </div>
                     </div>
-
-                    {/* <div className="p-3 bg-purple-50 rounded-lg">
-                      <div className="text-center">
-                        <div
-                          className={`text-lg font-bold ${
-                            cta.conversionRate >= 20
-                              ? "text-green-600"
-                              : cta.conversionRate >= 10
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {cta.conversionRate}%
-                        </div>
-                        <div className="text-xs text-purple-800">
-                          Conversion Rate
-                        </div>
-                      </div>
-                    </div> */}
 
                     <div className="space-y-2">
                       <h4 className="font-medium text-gray-900 text-sm">
@@ -677,6 +658,80 @@ const AnalyticsPage = () => {
                         {new Date(cta.lastInteraction).toLocaleString()}
                       </div>
                     </div>
+
+                    <div className="p-2 bg-yellow-50 rounded text-center">
+                      <div className="text-sm font-medium text-yellow-800">
+                        Avg per User:{" "}
+                        {cta.uniqueUsers > 0
+                          ? (cta.totalInteractions / cta.uniqueUsers).toFixed(1)
+                          : "0.0"}
+                      </div>
+                    </div>
+                  </div>
+                </ChartCard>
+              ))}
+            </div> */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {displayedCTAs.map((cta, index) => (
+                <ChartCard
+                  key={cta.ctaId}
+                  title={`CTA ${index + 1}`}
+                  className="transform transition-all duration-200 hover:scale-[1.02]"
+                >
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-3 bg-blue-50 rounded-lg">
+                        <div className="text-xl font-bold text-blue-600">
+                          {cta.totalInteractions}
+                        </div>
+                        <div className="text-xs text-blue-800">
+                          Total Interactions
+                        </div>
+                      </div>
+                      <div className="text-center p-3 bg-green-50 rounded-lg">
+                        <div className="text-xl font-bold text-green-600">
+                          {cta.uniqueUsers}
+                        </div>
+                        <div className="text-xs text-green-800">
+                          Unique Users
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-900 text-sm">
+                        Event Breakdown:
+                      </h4>
+                      <div className="max-h-24 overflow-y-auto space-y-1">
+                        {cta.stats.map((stat, statIndex) => (
+                          <div
+                            key={statIndex}
+                            className="flex items-center justify-between p-2 bg-gray-50 rounded"
+                          >
+                            <span className="text-sm text-gray-700 capitalize">
+                              {stat.eventType}
+                            </span>
+                            <div className="text-right">
+                              <div className="text-sm font-medium text-gray-900">
+                                {stat.count} events
+                              </div>
+                              <div className="text-xs text-gray-600">
+                                {stat.uniqueUsers} users
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {cta.totalInteractions > 0 && (
+                      <div className="p-2 bg-gray-50 rounded text-xs text-gray-600">
+                        <div>Last Interaction:</div>
+                        <div className="font-medium">
+                          {new Date(cta.lastInteraction).toLocaleString()}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="p-2 bg-yellow-50 rounded text-center">
                       <div className="text-sm font-medium text-yellow-800">
